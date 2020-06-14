@@ -136,7 +136,7 @@ COMPILER_OPTIONS =
 # For Fast target, open serial console, false or true
 # !!! Help: http://bit.ly/2AfyA37
 #
-NO_SERIAL_CONSOLE = false
+NO_SERIAL_CONSOLE = true
 
 
 # Teensy USB options (default)
