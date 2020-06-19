@@ -737,8 +737,8 @@ void AnschlagVonMotor(const uint8_t motor)
                
             }
             
-            sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-            sendbuffer[6]=abschnittnummer & 0xFF00;
+            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+            sendbuffer[6]=abschnittnummer & 0x00FF;
 
             sendbuffer[8]=ladeposition & 0x00FF;
             //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1027,8 +1027,8 @@ void loop()
             cncstatus = 0;
             sendbuffer[0]=0xE1;
             
-            sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-            sendbuffer[6]=abschnittnummer & 0xFF00;
+            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+            sendbuffer[6]=abschnittnummer & 0x00FF;
 
             sendbuffer[8]=ladeposition & 0x00FF;
            // sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1247,8 +1247,8 @@ void loop()
                AbschnittCounter=0;
                //sendbuffer[8]= versionintl;
                //sendbuffer[8]= versioninth;
-               sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-               sendbuffer[6]=abschnittnummer & 0xFF00;
+               sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+               sendbuffer[6]=abschnittnummer & 0x00FF;
                
                //lcd_gotoxy(0,0);
                sendbuffer[14] = (TIMERINTERVALL & 0xFF00)>>8;
@@ -1258,8 +1258,6 @@ void loop()
                
                if (code == 0xF0) // cncstatus fuer go_home setzen
                {
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
                   
                   sendbuffer[0]=0x45;
                   
@@ -1390,8 +1388,8 @@ void loop()
                       Serial.printf("erster Abschnitt, mehr Abschnitte ladeposition: %d endposition: %d\n",ladeposition,endposition);
                       //lcd_putc('*');
                       
-                      sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                      sendbuffer[6]=abschnittnummer & 0xFF00;
+                      sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                      sendbuffer[6]=abschnittnummer & 0x00FF;
                       
                       
                       sendbuffer[8]=ladeposition;
@@ -1641,8 +1639,8 @@ void loop()
                
                // Neu: letzten Abschnitt melden
                sendbuffer[0]=0xD0;
-               sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-               sendbuffer[6]=abschnittnummer & 0xFF00;
+               sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+               sendbuffer[6]=abschnittnummer & 0x00FF;
                sendbuffer[8]=ladeposition & 0x00FF;
             //   sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                usb_rawhid_send((void*)sendbuffer, 50);
@@ -1658,9 +1656,9 @@ void loop()
                
                Serial.printf("Motor A neuen Abschnitt abrufen mit A1\n");
                // neuen Abschnitt abrufen
-               Serial.printf("Motor A next abschnittnummer%d\n",abschnittnummer);
-               sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-               sendbuffer[6]=abschnittnummer & 0xFF00;
+               Serial.printf("Motor A next abschnittnummer: %d\n",abschnittnummer);
+               sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;
+               sendbuffer[6]=abschnittnummer & 0x00FF;
 
                sendbuffer[8]=ladeposition & 0x00FF;
            //    sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1770,8 +1768,8 @@ void loop()
                   
                   // Neu: letzten Abschnitt melden
                   sendbuffer[0]=0xD0;
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
 
                   sendbuffer[8]=ladeposition & 0x00FF;
                   //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1782,8 +1780,8 @@ void loop()
                else
                {
                   // neuen Abschnitt abruffen
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
 
                   sendbuffer[8]=ladeposition & 0x00FF;
                   //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1856,8 +1854,8 @@ void loop()
             //cli();
             Serial.printf("\nMotor C endpos\n");
              sendbuffer[0]=0xAD;
-            sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-            sendbuffer[6]=abschnittnummer & 0xFF00;
+            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+            sendbuffer[6]=abschnittnummer & 0x00FF;
 
             sendbuffer[8]=ladeposition;
             
@@ -1892,8 +1890,8 @@ void loop()
                   endposition=abschnittnummer; // letzter Abschnitt
                   // Neu: letzten Abschnitt melden
                   sendbuffer[0]=0xD0;
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
 
                   sendbuffer[8]=ladeposition & 0x00FF;
                   //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1904,8 +1902,8 @@ void loop()
                else
                {
                   // neuen Abschnitt abrufen
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
 
                   sendbuffer[8]=ladeposition & 0x00FF;
             //      sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -1990,8 +1988,8 @@ void loop()
                   endposition=abschnittnummer; // letzter Abschnitt
                   // Neu: letzten Abschnitt melden
                   sendbuffer[0]=0xD0;
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
 
                   sendbuffer[8]=ladeposition & 0x00FF;
               //    sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
@@ -2002,9 +2000,9 @@ void loop()
                else
                {
                   // neuen Abschnitt abruffen
-                  sendbuffer[5]=(abschnittnummer & 0xFF00) << 8;;
-                  sendbuffer[6]=abschnittnummer & 0xFF00;
-
+                  sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+                  sendbuffer[6]=abschnittnummer & 0x00FF;
+                 
                   sendbuffer[8]=ladeposition & 0x00FF;
                //   sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                   sendbuffer[0]=0xA3;
