@@ -1253,7 +1253,7 @@ void loop()
                //lcd_gotoxy(0,0);
                sendbuffer[14] = (TIMERINTERVALL & 0xFF00)>>8;
                sendbuffer[15] = (TIMERINTERVALL & 0x00FF);
-               
+               sendbuffer[8] = ladeposition;
                sendbuffer[0]=0xD1;
                
                if (code == 0xF0) // cncstatus fuer go_home setzen
@@ -1261,7 +1261,7 @@ void loop()
                   
                   sendbuffer[0]=0x45;
                   
-                    cncstatus |= (1<<GO_HOME); // Bit fuer go_home setzen
+                  cncstatus |= (1<<GO_HOME); // Bit fuer go_home setzen
                   usb_rawhid_send((void*)sendbuffer, 50);
                }
                else if (code == 0xF1)
@@ -1601,6 +1601,7 @@ void loop()
             Serial.printf("\nMotor A endpos\n");
             noInterrupts();
             ringbufferstatus = 0;
+            
             sendbuffer[19] = motorstatus;
             sendbuffer[20] = cncstatus;
             cncstatus=0;
@@ -1609,7 +1610,7 @@ void loop()
             sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;
             sendbuffer[6]=abschnittnummer & 0x00FF;
             
-          //  sendbuffer[8]=ladeposition & 0x00FF;
+            sendbuffer[8]=ladeposition & 0x00FF;
    //         sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             usb_rawhid_send((void*)sendbuffer, 50);
             ladeposition=0;
@@ -1746,7 +1747,9 @@ void loop()
             cncstatus=0;
             motorstatus=0;
             sendbuffer[0]=0xAD;
-            sendbuffer[1]=abschnittnummer;
+            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+            sendbuffer[6]=abschnittnummer & 0x00FF;
+            sendbuffer[8]=ladeposition & 0x00FF;
             usb_rawhid_send((void*)sendbuffer, 50);
             ladeposition=0;
             
