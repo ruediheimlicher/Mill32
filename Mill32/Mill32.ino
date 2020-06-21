@@ -1614,7 +1614,6 @@ void loop()
    //         sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             usb_rawhid_send((void*)sendbuffer, 50);
             ladeposition=0;
-            
             interrupts();
          }
          else 
