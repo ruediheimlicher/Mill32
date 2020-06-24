@@ -78,6 +78,10 @@
 #define COUNT_C            2 // 4      // Motorstatus:   Schritte von Motor C zaehlen
 #define COUNT_D            3 // 5      // Motorstatus:   Schritte von Motor D zaehlen
 
+
+#define COUNT_LAST         7
+
+
 #define TIMER_ON           1 // Bit fuer timerfunktion start
 
 #define DC                  7    // DC ON: LO
@@ -85,6 +89,8 @@
 
 #define GO_HOME            3     // Bit fuer befehl beginn home auf cncstatus
 #define DC_DIVIDER         1      // teilt die pwm-Frequenz in ISR
+
+
 
 
 // Ringbuffer
