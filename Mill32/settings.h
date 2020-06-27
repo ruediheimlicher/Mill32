@@ -78,7 +78,7 @@
 #define COUNT_C            2 // 4      // Motorstatus:   Schritte von Motor C zaehlen
 #define COUNT_D            3 // 5      // Motorstatus:   Schritte von Motor D zaehlen
 
-
+#define COUNT_END          6
 #define COUNT_LAST         7
 
 
