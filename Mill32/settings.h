@@ -114,12 +114,14 @@
 #define TIMERINTERVALL 128
 
 // Ramp
+#define RAMP_OK      1 // Ramp einschalten
 #define RAMPFAKTOR   2 // Verlaengerung der delayzeit
-#define RAMPZEIT     1000 // Mindestdauer fuer Ramp
+#define RAMPZEIT     800 // Mindestdauer fuer Ramp
 
 #define RAMPSTARTBIT 1
 #define RAMPENDBIT 2
 #define RAMPEND0BIT 3 // Beginn der Endrampe
+#define RAMPOKBIT    7
 #define RAMPSCHRITT  10
 
 
