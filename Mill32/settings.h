@@ -125,4 +125,10 @@
 #define RAMPSCHRITT  10
 
 
+#define DEVICE_MILL  1
+#define DEVICE_STEPPER  2
+
+#define VORZEICHEN_X   0
+#define VORZEICHEN_Y   1
+
 #endif /* settings_h */
