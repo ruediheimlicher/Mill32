@@ -460,14 +460,14 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterA = AbschnittDaten[0] | (AbschnittDaten[1]<<8) | (AbschnittDaten[2]<<16) | ((AbschnittDaten[3] & 0x7F)<<24);
    //uint32_t a  = AbschnittDaten[0] + (AbschnittDaten[1]<<8) + (AbschnittDaten[2]<<16) + ((AbschnittDaten[3] & 0x7F)<<24);
    //Serial.printf("l: %d\n",a);
-   DelayA = AbschnittDaten[4] | (AbschnittDaten[5]<<8) ;
+   DelayA = AbschnittDaten[4] | ((AbschnittDaten[5] & 0x7F)<<8) ;
    Serial.printf("StepCounterA: %d DelayA: %d\n",StepCounterA,DelayA);
    
    //Serial.printf("AbschnittDaten 6: %d AbschnittDaten 7: %d\n",AbschnittDaten[6], AbschnittDaten[7]);
    korrekturintervallx = AbschnittDaten[6] | ((AbschnittDaten[7] & 0x7F)<<8);
    korrekturcounterx = 0;
    korrekturintervallcounterx = 0;
-   
+   vorzeichen = 0;
 
    uint8_t vorzeichenx = (AbschnittDaten[7] & 0x80 )>> 7;
    if (vorzeichenx)
@@ -515,7 +515,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    digitalWriteFast(MB_EN,LOW);
  
    StepCounterB = AbschnittDaten[8] | (AbschnittDaten[9]<<8) | (AbschnittDaten[10]<<16) | ((AbschnittDaten[11] & 0x7F)<<24);
-   DelayB= AbschnittDaten[12] | (AbschnittDaten[13]<<8);
+   DelayB= AbschnittDaten[12] | ((AbschnittDaten[13]& 0x7F) <<8);
    Serial.printf("StepCounterB: %d DelayB: %d\n",StepCounterB,DelayB);
 
    korrekturintervally = AbschnittDaten[14] | ((AbschnittDaten[15] & 0x7F)<<8);
@@ -1773,6 +1773,7 @@ void loop()
              {
                 CounterA -= 1; // korrektur negativ, CounterA verkleinern
              }
+             else
              {
                 CounterA += 1;// korrektur positiv, CounterA vergroessern
              }
@@ -1799,8 +1800,8 @@ void loop()
          {
             sendstatus |= (1<<COUNT_B); // Motor B auch markieren
          }
-         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d",abschnittnummer);
-//         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
+         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d korrekturcounterx: %d korrekturcountery: %d",abschnittnummer,korrekturcounterx, korrekturcountery);
+         //         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
          //        Serial.printf("Rampbreite: %d rampendstep: %d",rampbreite, rampendstep);
            
          // Begin Ringbuffer-Stuff
@@ -1930,8 +1931,9 @@ void loop()
          {
             CounterB -= 1; // korrektur negativ, CounterA verkleinern
          }
+         else
          {
-            CounterB += 1;// korrektur positiv, CounterA vergroessern
+           CounterB += 1;// korrektur positiv, CounterA vergroessern
          }
       }
       
@@ -1952,7 +1954,9 @@ void loop()
          {
             sendstatus |= (1<<COUNT_A); // Motor A abgelaufen, auch markieren
          }
-         Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d",abschnittnummer);
+        // Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d",abschnittnummer);
+         Serial.printf("\nMotor A StepCounterB abgelaufen abschnittnummer: %d korrekturcounterx: %d korrekturcountery: %d",abschnittnummer,korrekturcounterx, korrekturcountery);
+
 //         Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus,StepCounterA,sendstatus);
   
          // Begin Ringbuffer-Stuff
@@ -2342,6 +2346,8 @@ void loop()
              */
          }
          sendstatus = 0;
+         Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);  
+      
       }
       
       
@@ -2375,7 +2381,7 @@ void loop()
    
    if (sendstatus)
    {
- //     Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);
+      Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);
  //     sendstatus = 0;
    }
 
