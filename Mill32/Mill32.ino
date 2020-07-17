@@ -1146,7 +1146,10 @@ void loop()
             
          }break;
          
+         case 0xB3: // sendTextdaten
+         {
             
+         }break;
             
             
          case 0xE0: // Man: Alles stoppen
@@ -1583,7 +1586,7 @@ void loop()
                   if (abschnittnummer==0)  // Start
                   {
                      noInterrupts();
-                     Serial.printf("Device 2 abschnittnummer 0 \t25: %d \t 32: %d\n",buffer[25],buffer[32]);
+                     Serial.printf("Device 2 abschnittnummer 0 \t buffer25: %d \t buffer32: %d\n",buffer[25],buffer[32]);
                      sendbuffer[24] =  buffer[32];  
                      //             Serial.printf("count: %d\n",buffer[22]);
                      PWM= buffer[29];
@@ -1641,6 +1644,8 @@ void loop()
                      //lcd.print(String(abschnittnummer));
                      
                   }
+                  
+                  // abschnittnummer beliebig
                   {
                      
                      uint8_t pos=(abschnittnummer);
@@ -2355,7 +2360,7 @@ void loop()
          if (abschnittnummer == endposition)
          {
             Serial.printf("\n****************************************\n");
-            Serial.printf("\n sendstatus 3  abschnittnummer = endposition\n");
+            Serial.printf("\n sendstatus <=3  %d  abschnittnummer = endposition\n",sendstatus);
             Serial.printf("\n****************************************\n");
          }
          
@@ -2369,7 +2374,10 @@ void loop()
          
          
          {
+            // ***************************************
             sendbuffer[0]=0xA1;
+            // ***************************************
+            
             usb_rawhid_send((void*)sendbuffer, 50);
             
             /*         
@@ -2408,10 +2416,10 @@ void loop()
              }
              */
          }
-         sendstatus = 0;
-         //Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);  
-         Serial.printf("\nsendstatus: %d abschnittnummer: %d aktuelleladeposition: %d\n", sendstatus,abschnittnummer,aktuelleladeposition);  
          
+         //Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);  
+         Serial.printf("\n end <=3 sendstatus: %d abschnittnummer: %d aktuelleladeposition: %d\n", sendstatus,abschnittnummer,aktuelleladeposition);  
+         sendstatus = 0;
       }
       
       
@@ -2428,7 +2436,11 @@ void loop()
 
          //       sendbuffer[0]=0xD0;
          //      motorstatus=0;
+         
+         // ***************************************
          sendbuffer[0]=0xAD;
+         // ***************************************
+         
          sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
          sendbuffer[6]=abschnittnummer & 0x00FF;
          
@@ -2447,7 +2459,7 @@ void loop()
    if (sendstatus)
    {
       //Serial.printf("\nsendstatus: %d abschnittnummer: %d globalaktuelleladeposition: %d\n", sendstatus,abschnittnummer,globalaktuelleladeposition);
-      Serial.printf("\nsendstatus: %d abschnittnummer: %d aktuelleladeposition: %d\n", sendstatus,abschnittnummer,aktuelleladeposition);
+      //Serial.printf("\nsendstatus: %d abschnittnummer: %d aktuelleladeposition: %d\n", sendstatus,abschnittnummer,aktuelleladeposition);
  //     sendstatus = 0;
    }
 
