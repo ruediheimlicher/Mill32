@@ -480,7 +480,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    {
       vorzeichen &= ~(1<<VORZEICHEN_X);
    }
-//   Serial.printf("korrekturintervallx: %d vorzeichenx: %d\n",korrekturintervallx,vorzeichenx);
+   Serial.printf("korrekturintervallx: %d vorzeichenx: %d\n",korrekturintervallx,vorzeichenx);
    
 //   Serial.printf("StepCounterA: %d DelayA: %d\n",StepCounterA,DelayA);
 //   Serial.printf("dataL: %d dataH: %d  delayL: %d delayH: %d\n",dataL,dataH, delayL,delayH);
@@ -536,6 +536,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    {
       vorzeichen &= ~(1<<VORZEICHEN_Y);
    }
+   Serial.printf("korrekturintervally: %d vorzeicheny: %d\n",korrekturintervally,vorzeicheny);
 
    if (AbschnittDaten[11] & 0x80) // Bit 7 gesetzt, negative zahl
    {
@@ -1149,22 +1150,34 @@ void loop()
   #pragma mark B3       
          case 0xB3: // sendTextdaten
          {
-            Serial.printf("B3 Joystick\n");
+            Serial.printf("*B3 Joystick*\n");
+            uint8_t i=0;
+            for(i=0;i<33;i++) // 5 us ohne printf, 10ms mit printf
+            { 
+               Serial.printf("%d \t",buffer[i]);
+            }
+            Serial.printf("\n");
             sendbuffer[24] =  buffer[32];
             
             uint8_t indexh=buffer[26];
             uint8_t indexl=buffer[27];
-            
+            Serial.printf("indexh: %d indexl: %d\n",indexh,indexl);
             abschnittnummer= indexh<<8;
             abschnittnummer += indexl;
+            Serial.printf("abschnittnummer: *%d*\n",abschnittnummer);
+            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+            sendbuffer[6]=abschnittnummer & 0x00FF;
             
             // Lage:
             
             uint8_t lage = buffer[25];
+            
+            Serial.printf("B3 abschnittnummer: %d\tbuffer25 lage: %d \t device: %d\n",abschnittnummer,lage,buffer[32]);
+            //             Serial.printf("count: %d\n",buffer[22]);
             if (abschnittnummer==0)  // Start
             {
                noInterrupts();
-               Serial.printf("abschnittnummer 0 \tbuffer25 lage: %d \t buffer32 device: %d\n",buffer[25],buffer[32]);
+               Serial.printf("B3 abschnittnummer 0 \tbuffer25 lage: %d \t buffer32 device: %d\n",buffer[25],buffer[32]);
                //             Serial.printf("count: %d\n",buffer[22]);
                  PWM= buffer[29];
                //              lcd.print(String(PWM));
@@ -1176,6 +1189,8 @@ void loop()
                cncstatus = 0;
                sendstatus = 0;
                motorstatus = 0;
+               korrekturcounterx = 0;
+               korrekturcountery = 0;
                ringbufferstatus=0x00;
                anschlagstatus=0;
                ringbufferstatus |= (1<<FIRSTBIT);
@@ -1210,7 +1225,7 @@ void loop()
                 }
                 */
                // Abschnitt 0 melden
-               usb_rawhid_send((void*)sendbuffer, 50);
+ //              usb_rawhid_send((void*)sendbuffer, 50);
                
                //               startTimer2();
                //               interrupts();
@@ -1218,8 +1233,9 @@ void loop()
             }
             else // Abschnittnummer > 0
             {
+               Serial.printf("XX\n");
                // Ablauf schon gestartert
-                         Serial.printf("  -----                  B3 Ablauf gestartet, abschnittnummer: %d\n",abschnittnummer);
+               //          Serial.printf("  -----                  B3 Ablauf gestartet, abschnittnummer: %d\n",abschnittnummer);
                //lcd.setCursor(12,0);
                //lcd.print(String(abschnittnummer));
                
@@ -1257,7 +1273,7 @@ void loop()
             }
             
             // Daten laden in ringbuffer an Position pos
-            uint8_t i=0;
+  //          uint8_t i=0;
             /*
              for(i=0;i<10;i++)
              {
@@ -1274,7 +1290,7 @@ void loop()
                
                CNCDaten[pos][i]=buffer[i];  
             }
-         
+            interrupts();
          }break;
             
             
@@ -1706,7 +1722,7 @@ void loop()
 #pragma mark DEVICE 2    Joystick            
                case 2:
                {
- //                 Serial.printf("default device 2 code: %d\n",code);
+                  Serial.printf("default device 2 code: %d\n",code);
 #pragma mark abschnittnummer 0
                   
                   if (abschnittnummer==0)  // Start
@@ -1959,8 +1975,9 @@ void loop()
       korrekturintervallcounterx++;
       if (korrekturintervallcounterx > korrekturintervallx) // 
       {
-         //Serial.printf("MA korr");
+         
          korrekturcounterx++;
+         Serial.printf("MA korr korrekturcounterx: %d\n",korrekturcounterx);
          korrekturintervallcounterx = 0;
          if (vorzeichen & (1<<VORZEICHEN_X)) 
          {
@@ -1974,7 +1991,7 @@ void loop()
       
       
       //     Serial.printf("Motor A StepCounterA: %d\n",StepCounterA);
-      //      Serial.printf("Motor A CounterA: %d StepCounterA: %d \n",CounterA, StepCounterA);
+      Serial.printf("Motor A CounterA: %d StepCounterA: %d \n",CounterA, StepCounterA);
       if (StepCounterA > 0)
       {
          StepCounterA--; // ein Step weniger
@@ -1993,8 +2010,8 @@ void loop()
          {
             sendstatus |= (1<<COUNT_B); // Motor B auch markieren
          }
- //        Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d korrekturcounterx: %d korrekturcountery: %d StepCounterB: %d\n",abschnittnummer,korrekturcounterx, korrekturcountery,StepCounterB);
-         //         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
+         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d korrekturcounterx: %d korrekturcountery: %d StepCounterB: %d\n",abschnittnummer,korrekturcounterx, korrekturcountery,StepCounterB);
+                  Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
          //        Serial.printf("Rampbreite: %d rampendstep: %d",rampbreite, rampendstep);
          
          // Begin Ringbuffer-Stuff
@@ -2126,6 +2143,7 @@ void loop()
       {
          //Serial.printf("MB korr");
          korrekturcountery++;
+ //        Serial.printf("MB korr korrekturcountery: %d\n",korrekturcountery);
          korrekturintervallcountery = 0;
          if (vorzeichen & (1<<VORZEICHEN_Y)) 
          {
