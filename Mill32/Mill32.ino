@@ -480,7 +480,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    {
       vorzeichen &= ~(1<<VORZEICHEN_X);
    }
-   Serial.printf("korrekturintervallx: %d vorzeichenx: %d\n",korrekturintervallx,vorzeichenx);
+ //  Serial.printf("korrekturintervallx: %d vorzeichenx: %d\n",korrekturintervallx,vorzeichenx);
    
 //   Serial.printf("StepCounterA: %d DelayA: %d\n",StepCounterA,DelayA);
 //   Serial.printf("dataL: %d dataH: %d  delayL: %d delayH: %d\n",dataL,dataH, delayL,delayH);
@@ -536,7 +536,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    {
       vorzeichen &= ~(1<<VORZEICHEN_Y);
    }
-   Serial.printf("korrekturintervally: %d vorzeicheny: %d\n",korrekturintervally,vorzeicheny);
+   //Serial.printf("korrekturintervally: %d vorzeicheny: %d\n",korrekturintervally,vorzeicheny);
 
    if (AbschnittDaten[11] & 0x80) // Bit 7 gesetzt, negative zahl
    {
@@ -1176,7 +1176,7 @@ void loop()
             //             Serial.printf("count: %d\n",buffer[22]);
             if (abschnittnummer==0)  // Start
             {
-               noInterrupts();
+               //noInterrupts();
                Serial.printf("B3 abschnittnummer 0 \tbuffer25 lage: %d \t buffer32 device: %d\n",buffer[25],buffer[32]);
                //             Serial.printf("count: %d\n",buffer[22]);
                  PWM= buffer[29];
@@ -1445,6 +1445,9 @@ void loop()
             CounterC=0;
             CounterD=0;
             
+            korrekturcounterx = 0;
+            korrekturcountery = 0;
+            
             digitalWriteFast(MA_EN,HIGH);
             digitalWriteFast(MB_EN,HIGH);
 
@@ -1463,9 +1466,9 @@ void loop()
              _delay_ms(1000);
              */
             //sei();
-            //sendbuffer[0]=0xF2;
-            //usb_rawhid_send((void*)sendbuffer, 50);
-            //sendbuffer[0]=0x00;
+            sendbuffer[0]=0xF2;
+   //         usb_rawhid_send((void*)sendbuffer, 50);
+            sendbuffer[0]=0x00;
             
          }break;
             
@@ -1530,7 +1533,7 @@ void loop()
                   
                   if (abschnittnummer==0)  // Start
                   {
-                     noInterrupts();
+  //                   //noInterrupts();
   //                   Serial.printf("abschnittnummer 0 \t25: %d \t 32: %d\n",buffer[25],buffer[32]);
                      sendbuffer[24] =  buffer[32];  
                      //             Serial.printf("count: %d\n",buffer[22]);
@@ -1727,7 +1730,7 @@ void loop()
                   
                   if (abschnittnummer==0)  // Start
                   {
-                     noInterrupts();
+                     //noInterrupts();
   //                   Serial.printf("Device 2 abschnittnummer 0 \t buffer25: %d \t buffer32: %d\n",buffer[25],buffer[32]);
                      sendbuffer[24] =  buffer[32];  
                      //             Serial.printf("count: %d\n",buffer[22]);
@@ -1850,7 +1853,7 @@ void loop()
    /**   Start CNC-routinen   ***********************/
    if (ringbufferstatus & (1<<STARTBIT)) // Buffer ist in Ringbuffer geladen, Schnittdaten von Abschnitt 0 laden
    {
-      noInterrupts();
+      //noInterrupts();
       
  //     Serial.printf("\n\n                 Abschnitt 0 laden ringbufferstatus: %d\n",ringbufferstatus);
       ringbufferstatus &= ~(1<<STARTBIT);  // Startbit entfernen      
@@ -1967,7 +1970,7 @@ void loop()
    // Es hat noch Steps, CounterA ist abgezaehlt (DelayA bestimmt Impulsabstand fuer Steps)
    if ((StepCounterA > 0)  && (CounterA == 0) &&(!(anschlagstatus & (1<< END_A0))))
    {
-      noInterrupts();
+      //noInterrupts();
       
       // Impuls starten
       digitalWriteFast(MA_STEP,LOW);
@@ -1977,21 +1980,28 @@ void loop()
       {
          
          korrekturcounterx++;
-         Serial.printf("MA korr korrekturcounterx: %d\n",korrekturcounterx);
+ //        Serial.printf("MA korr korrekturcounterx: %d StepCounterA: %d\n",korrekturcounterx,StepCounterA);
          korrekturintervallcounterx = 0;
          if (vorzeichen & (1<<VORZEICHEN_X)) 
          {
             CounterA -= 1; // korrektur negativ, CounterA verkleinern
+            if (StepCounterA > 0)
+            {
+ //              StepCounterA--; // ein Step weniger
+            }
+
+         
          }
          else
          {
+ //           StepCounterA++;
             CounterA += 1;// korrektur positiv, CounterA vergroessern
          }
       }
       
       
       //     Serial.printf("Motor A StepCounterA: %d\n",StepCounterA);
-      Serial.printf("Motor A CounterA: %d StepCounterA: %d \n",CounterA, StepCounterA);
+ //     Serial.printf("Motor A CounterA: %d StepCounterA: %d \n",CounterA, StepCounterA);
       if (StepCounterA > 0)
       {
          StepCounterA--; // ein Step weniger
@@ -2019,7 +2029,7 @@ void loop()
          if ((abschnittnummer==endposition)) // Ablauf fertig
          {  
             Serial.printf("-----------------------> Motor A endpos korrekturcounterx: %d korrekturcountery: %d\n",korrekturcounterx, korrekturcountery);
-            noInterrupts();
+            //noInterrupts();
             ringbufferstatus = 0;
             
             //           if (StepCounterB == 0) // erst beide abzaehlen
@@ -2060,7 +2070,7 @@ void loop()
             if (aktuellelage==2) // war letzter Abschnitt
             {
  //              Serial.printf("\tMotor A last Abschnitt\n");
-               noInterrupts();
+               //noInterrupts();
                endposition=abschnittnummer; // letzter Abschnitt
                
                /*
@@ -2133,7 +2143,7 @@ void loop()
    
    if ((StepCounterB > 0) && (CounterB == 0)&&(!(anschlagstatus & (1<< END_B0))))
    {
-      noInterrupts();
+      //noInterrupts();
       
       //STEPPERPORT_1 &= ~(1<<MB_STEP);               // Impuls an Motor B LO ON
       digitalWriteFast(MB_STEP,LOW);
@@ -2143,14 +2153,19 @@ void loop()
       {
          //Serial.printf("MB korr");
          korrekturcountery++;
- //        Serial.printf("MB korr korrekturcountery: %d\n",korrekturcountery);
-         korrekturintervallcountery = 0;
+ //        Serial.printf("MB korr korrekturcounterxy: %d StepCounterB: %d\n",korrekturcountery,StepCounterB);         korrekturintervallcountery = 0;
          if (vorzeichen & (1<<VORZEICHEN_Y)) 
          {
+            if (StepCounterB > 0)
+            {
+     //          StepCounterB--;
+            }
+
             CounterB -= 1; // korrektur negativ, CounterA verkleinern
          }
          else
          {
+  //fB korr korrekturcounterxy:          StepCounterB++;
            CounterB += 1;// korrektur positiv, CounterA vergroessern
          }
       }
@@ -2183,7 +2198,7 @@ void loop()
          {  
             //cli();
             Serial.printf("----------------------> Motor B endpos korrekturcounterx: %d korrekturcountery: %d\n",korrekturcounterx, korrekturcountery);
-            noInterrupts();
+            //noInterrupts();
             ringbufferstatus = 0;
             
             //           if (StepCounterA == 0)
@@ -2224,7 +2239,7 @@ void loop()
             
             if (aktuellelage==2) // war letzter Abschnitt
             {
-               noInterrupts();
+               //noInterrupts();
                endposition=abschnittnummer; // letzter Abschnitt
                Serial.printf("\tMotor B last Abschnitt\n");
                // sendstatus |= (1<<COUNT_LAST);
@@ -2289,7 +2304,7 @@ void loop()
    // Es hat noch Steps, CounterC ist abgezaehlt (DelayA bestimmt Impulsabstand fuer Steps)
    if (StepCounterC &&(CounterC == 0) &&(!(anschlagstatus & (1<< END_C0))))//||(cncstatus & (1<< END_D0)))))//   
    {
-      noInterrupts();
+      //noInterrupts();
       // Impuls starten
       //STEPPERPORT_2 &= ~(1<<MC_STEP);   // Impuls an Motor C LO -> ON
       digitalWriteFast(MC_STEP,LOW);
