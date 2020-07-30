@@ -14,7 +14,7 @@
 
 // Stepper A
 
-/*
+
  // neu 200730
  
  #define MA_STEP   0
@@ -22,16 +22,20 @@
  #define MB_STEP   2
  #define MB_RI   3
  #define MAB_EN   4
- 
+ #define MA_EN           4
+ #define MB_EN           4
  #define END_A0_PIN   5
  #define END_A1_PIN   6
  #define END_B0_PIN   7
  #define END_B1_PIN   8
  
+
  #define MC_STEP   14
  #define MC_RI   15
  #define MC_EN   16
- 17
+ 
+ /*
+ 
  // 18, 19: I2C   
  
  #define END_C0_PIN   20
@@ -42,7 +46,7 @@
  
  */
  //Pins 
-
+/*
  #define MA_STEP         0
  #define MA_RI           1
  #define MA_EN           2
@@ -54,16 +58,17 @@
  
  #define END_A0_PIN      6           // Bit fuer Endanschlag bei A0
  #define END_B0_PIN      7           // Bit fuer Endanschlag bei A1
- 
+ */
 #define STROM              8
 #define DC_PWM               9
 
 // 10,11,12: SPI
-
+/*
 #define MC_STEP            14           // PIN auf Stepperport 2
 #define MC_RI              15
 #define MC_EN              16
-#define MD_STEP            17           // PIN auf Stepperport 2
+*/
+ #define MD_STEP            17           // PIN auf Stepperport 2
 // 18, 19: I2C
 #define MD_RI              20
 #define MD_EN              21
