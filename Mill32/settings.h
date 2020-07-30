@@ -14,11 +14,40 @@
 
 // Stepper A
 
+/*
+ // neu 200730
+ 
+ #define MA_STEP   0
+ #define MA_RI   1
+ #define MB_STEP   2
+ #define MB_RI   3
+ #define MAB_EN   4
+ 
+ #define END_A0_PIN   5
+ #define END_A1_PIN   6
+ #define END_B0_PIN   7
+ #define END_B1_PIN   8
+ 
+ #define MC_STEP   14
+ #define MC_RI   15
+ #define MC_EN   16
+ 17
+ // 18, 19: I2C   
+ 
+ #define END_C0_PIN   20
+ #define END_C1_PIN   21
+ 
+ #define STROM   22
+ #define DC_PWM   23
+ 
+ */
  //Pins 
+
  #define MA_STEP         0
  #define MA_RI           1
  #define MA_EN           2
  
+// Stepper B
  #define MB_STEP         3
  #define MB_RI           4
  #define MB_EN           5
@@ -29,8 +58,7 @@
 #define STROM              8
 #define DC_PWM               9
 
-
-// Stepper B
+// 10,11,12: SPI
 
 #define MC_STEP            14           // PIN auf Stepperport 2
 #define MC_RI              15
@@ -45,8 +73,11 @@
 
 
 
+
 #define TASTE0            0   // HALT-Bit Motor A
 #define TASTE1            1
+
+
 
 
 #define STARTDELAYBIT       0
@@ -126,7 +157,7 @@
 
 
 #define DEVICE_MILL  1
-#define DEVICE_STEPPER  2
+#define DEVICE_JOY  2
 
 #define VORZEICHEN_X   0
 #define VORZEICHEN_Y   1
