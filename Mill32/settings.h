@@ -16,20 +16,20 @@
 
 
  // neu 200730
- 
+ /*
  #define MA_STEP   0
  #define MA_RI   1
  #define MB_STEP   2
  #define MB_RI   3
  #define MAB_EN   4
  #define MA_EN           4
- #define MB_EN           4
+ #define MB_EN           23
  #define END_A0_PIN   5
  #define END_A1_PIN   6
  #define END_B0_PIN   7
  #define END_B1_PIN   8
  
-
+*/
  #define MC_STEP   14
  #define MC_RI   15
  #define MC_EN   16
@@ -46,7 +46,7 @@
  
  */
  //Pins 
-/*
+
  #define MA_STEP         0
  #define MA_RI           1
  #define MA_EN           2
@@ -58,7 +58,7 @@
  
  #define END_A0_PIN      6           // Bit fuer Endanschlag bei A0
  #define END_B0_PIN      7           // Bit fuer Endanschlag bei A1
- */
+ 
 #define STROM              8
 #define DC_PWM               9
 
