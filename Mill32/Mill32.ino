@@ -1137,7 +1137,7 @@ void loop()
 #pragma mark B1    
          case 0xB1:
          {
-            Serial.printf("B1 Joystick\n");
+            Serial.printf("B1 PCB\n");
             uint8_t indexh=buffer[26];
             uint8_t indexl=buffer[27];
             

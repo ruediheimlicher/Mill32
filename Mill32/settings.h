@@ -38,11 +38,6 @@
 #define DC_PWM               9
 
 // 10,11,12: SPI
-/*
-#define MC_STEP            14           // PIN auf Stepperport 2
-#define MC_RI              15
-#define MC_EN              16
-*/
  #define MD_STEP            17           // PIN auf Stepperport 2
 // 18, 19: I2C
 #define MD_RI              20
