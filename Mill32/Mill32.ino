@@ -1,3 +1,5 @@
+
+
 ///
 /// @mainpage	Stepper32
 ///
@@ -46,10 +48,12 @@
 #include <SPI.h>
 #include "lcd.h"
 #include "settings.h"
-//#include <Wire.h>
-#include <i2c_t3.h>
+//#include <util/delay.h>
+
+#include <Wire.h>
+//#include <i2c_t3.h>
 #include <LiquidCrystal_I2C.h> // auch in Makefile angeben!!!
-#include <TeensyThreads.h>
+//#include <TeensyThreads.h>
 // Set parameters
 
 
@@ -88,7 +92,7 @@ elapsedMillis sincelastthread;
 
 // Prototypes
 
-static volatile uint8_t buffer[USB_DATENBREITE]={};
+volatile uint8_t buffer[USB_DATENBREITE]={};
 static volatile uint8_t sendbuffer[USB_DATENBREITE]={};
 
 // Ringbuffer
@@ -191,6 +195,7 @@ volatile uint32_t          rampendstep = 0; // Beginn der Endramp. Wird in Absch
 IntervalTimer              delayTimer;
 
 // Utilities
+// Ganssle
 
 
 // Functions
@@ -818,7 +823,7 @@ void AnschlagVonMotor(const uint8_t motor)
             sendbuffer[8]=ladeposition & 0x00FF;
             //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             sendbuffer[20]=cncstatus;
-            usb_rawhid_send((void*)sendbuffer, 50);
+//            usb_rawhid_send((void*)sendbuffer, 50);
              
             //ladeposition=0;
             // motorstatus=0;
@@ -1383,7 +1388,10 @@ void loop()
          
          }break;
             
-            
+         case 0xCA:
+         {
+            Serial.printf("case CA\n");
+         }break;
             
             
          case 0xE0: // Man: Alles stoppen

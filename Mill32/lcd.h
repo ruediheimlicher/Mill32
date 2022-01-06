@@ -130,7 +130,7 @@ void lcd_puthex(uint8_t zahl);
 void lcd_cls(void);
 void lcd_clr_line(uint8_t Linie);
 void lcd_put_zeit(uint8_t minuten, uint8_t stunden);
-void lcd_put_wochentag(uint8_t wd);
+//void lcd_put_wochentag(uint8_t wd);
 void lcd_put_temperatur(uint16_t temperatur);
 void lcd_put_tempAbMinus20(uint16_t temperatur);
 

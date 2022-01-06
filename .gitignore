@@ -6,3 +6,4 @@ teensy*
 /Transfer/*
 digi*
 *.xcodeproj*
+Libraries/**

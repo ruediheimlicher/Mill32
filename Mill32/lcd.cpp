@@ -579,14 +579,14 @@ void lcd_put_zeit(uint8_t minuten, uint8_t stunden)
    
    lcd_puts(zeitString);
 }
-
+/*
 void lcd_put_wochentag(uint8_t wd)
 {
    char* wochentag[] = {"MO","DI","MI","DO","FR","SA","SO"};
    
    lcd_puts(wochentag[wd-1]);   // Array wochentag ist null-basiert
 }
-
+*/
 void lcd_put_temperatur(uint16_t temperatur)
 {
    char buffer[8]={};

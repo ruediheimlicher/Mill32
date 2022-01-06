@@ -73,7 +73,7 @@
 #   XPT2046_Touchscreen [i] i2c_t3 [k] ks0108 [o] openGLCD 
 #   [s] ssd1351 [x] x10 
 #
-APP_LIBS_LIST =  ADC SPI LiquidCrystal_I2C i2c_t3 TeensyThreads
+APP_LIBS_LIST =  ADC SPI LiquidCrystal_I2C  Wire TeensyThreads # i2c_t3
 
 # List user's libraries here
 # !!! Help: http://bit.ly/2AEscDx
