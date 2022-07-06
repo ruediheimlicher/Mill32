@@ -15,11 +15,7 @@
 // Stepper A
 
 
- // neu 200730
- #define MC_STEP   14
- #define MC_RI   15
- #define MC_EN   16
- 
+  
  //Pins 
 
  #define MA_STEP         0
@@ -30,10 +26,19 @@
  #define MB_STEP         3
  #define MB_RI           4
  #define MB_EN           5
+
+// Stepper C
+#define MC_STEP            6           // 
+#define MC_RI              7
+#define MC_EN              8
+
+
  
- #define END_A0_PIN      6           // Bit fuer Endanschlag bei A0
- #define END_B0_PIN      7           // Bit fuer Endanschlag bei A1
- 
+ #define END_A0_PIN      15           // Bit fuer Endanschlag bei A0
+#define END_A1_PIN      16   
+
+#define END_B0_PIN      20           // Bit fuer Endanschlag bei A1
+#define END_B1_PIN      21   
 #define STROM              8
 #define DC_PWM               9
 
@@ -133,6 +138,8 @@
 
 #define DEVICE_MILL  1
 #define DEVICE_JOY  2
+
+#define DEVICE_CNC   3
 
 #define VORZEICHEN_X   0
 #define VORZEICHEN_Y   1
