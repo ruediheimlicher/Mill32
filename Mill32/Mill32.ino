@@ -496,7 +496,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    
    // Motor B
    //CounterB=0;
-   digitalWriteFast(MB_EN,LOW);   
+   digitalWriteFast(MB_EN,LOW);   // Pololu ON
    dataL=AbschnittDaten[2];
    dataH=AbschnittDaten[3];
    //lcd_gotoxy(19,1);
@@ -509,8 +509,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    else 
    {
       richtung &= ~(1<<RICHTUNG_B);
-      digitalWriteFast(MB_RI, LOW);
-      //lcd_putc('v');
+      digitalWriteFast(MB_RI, HIGH);
    }
    
    dataH &= (0x7F);
