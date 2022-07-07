@@ -442,7 +442,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    int lage = 0;
    //   lage = AbschnittDaten[9]; // Start: 1, innerhalb: 0, Ende: 2
    lage = AbschnittDaten[17]; // Start: 1, innerhalb: 0, Ende: 2
-   Serial.printf("\n\nAbschnittLaden_4M lage: %d\n",lage);
+   Serial.printf("\n\nfunktion AbschnittLaden_4M lage: %d",lage);
    if (lage & 0x01)
    {
       returnwert=1;
@@ -608,7 +608,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    
    startTimer2();
    
-   Serial.printf("\n\nAbschnittLaden_4M end\n\n");
+   Serial.printf("funktion AbschnittLaden_4M end\n\n");
     return returnwert;
  
 }
@@ -1645,7 +1645,7 @@ void loop()
                         
                         if (buffer[17]& 0x02)// letzter Abschnitt
                         {
-                           Serial.printf("default last Abschnitt: %d\n",buffer[17]);
+                           Serial.printf("default last Abschnitt: %d, endposition=abschnittnummer\n",buffer[17]);
                            ringbufferstatus |= (1<<LASTBIT);
                            if (ringbufferstatus & (1<<FIRSTBIT)) // nur ein Abschnitt
                            {
@@ -2047,12 +2047,9 @@ void loop()
             sendstatus |= (1<<COUNT_A); // Motor A abgelaufen, auch markieren
          }
          
-         // Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d",abschnittnummer);
-   //      Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d  StepCounterA: %d\n",abschnittnummer,endposition,StepCounterA);
 
          Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterA, sendstatus);
           
-         //         Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus,StepCounterA,sendstatus);
          
          // Begin Ringbuffer-Stuff
          
