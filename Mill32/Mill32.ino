@@ -1866,10 +1866,9 @@ void loop()
        
       //     Serial.printf("Motor A StepCounterA: %d\n",StepCounterA);
       //     Serial.printf("Motor A CounterA: %d StepCounterA: %d \n",CounterA, StepCounterA);
-      if (StepCounterA > 0)
-      {
-         StepCounterA--; // ein Step weniger
-      }
+          
+      StepCounterA--; // ein Step weniger
+      
       
       // Wenn StepCounterA jetzt abgelaufen und relevant: next Datenpaket abrufen
       if ((StepCounterA == 0 ) && (motorstatus & (1<< COUNT_A)))    // StepCounterA abgelaufen, Motor A ist relevant fuer Stepcount
@@ -1937,7 +1936,6 @@ void loop()
             // aktuellen Abschnitt laden
             //aktuellelage = CNCDaten[aktuelleladeposition][25];
             //globalaktuelleladeposition = ladeposition;
-            aktuelleladeposition = ladeposition;
             
             //              Serial.printf("\tMotor A globalaktuelleladeposition: %d\n",globalaktuelleladeposition);
             // > verschoben in 'sendstatus-Bearbeitung
@@ -1960,8 +1958,8 @@ void loop()
                 //   sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                sendbuffer[22] = cncstatus;
                 usb_rawhid_send((void*)sendbuffer, 50);
-                ringbufferstatus |= (1<<ENDBIT);
-                ringbufferstatus |= (1<<LASTBIT);
+         //       ringbufferstatus |= (1<<ENDBIT);
+         //       ringbufferstatus |= (1<<LASTBIT);
                 interrupts();
                 //endposition = 0xFFFF;
                 
@@ -1972,10 +1970,13 @@ void loop()
                //                    Serial.printf("\tMotor A next abschnittnummer: %d\n",abschnittnummer);
                
                
-                sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;
-                sendbuffer[6]=abschnittnummer & 0x00FF;
+    //            sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;
+    //            sendbuffer[6]=abschnittnummer & 0x00FF;
+               
+               sendbuffer[5]=abschnittnummer;
+               sendbuffer[6]=ladeposition;
                 
-                sendbuffer[8]=ladeposition & 0x00FF;
+  //             sendbuffer[8]=ladeposition & 0x00FF;
                 //    sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                 sendbuffer[0]=0xA1;
                sendbuffer[22] = cncstatus;
@@ -2029,10 +2030,8 @@ void loop()
       //STEPPERPORT_1 &= ~(1<<MB_STEP);               // Impuls an Motor B LO ON
       digitalWriteFast(MB_STEP,LOW);
       CounterB= DelayB;
-      if (StepCounterB > 0)
-      {
-         StepCounterB--;
-      }
+      StepCounterB--;
+      
       
       if ((StepCounterB == 0)  && (motorstatus & (1<< COUNT_B))) // StepCounterB jetzt abgelaufen, Motor B ist relevant fuer Stepcount 
       {
@@ -2069,7 +2068,8 @@ void loop()
             Serial.printf("----------------------> Motor B endpos \n");
             //noInterrupts();
             ringbufferstatus = 0;
-            
+            //motorstatus &= ~(1<< COUNT_B);
+            motorstatus=0;
             //           if (StepCounterA == 0)
             {
                sendstatus |= (1<<COUNT_LAST); // beenden abzeigen
@@ -2081,10 +2081,16 @@ void loop()
             //     motorstatus=0;
             
             //           sendbuffer[0]=0xAD;
+            /*
             sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
             sendbuffer[6]=abschnittnummer & 0x00FF;
             sendbuffer[8]=ladeposition & 0x00FF;
             sendbuffer[22] = cncstatus;
+            */
+            sendbuffer[5]=abschnittnummer;
+            sendbuffer[6]=ladeposition;
+            sendbuffer[22] = cncstatus;
+
             usb_rawhid_send((void*)sendbuffer, 50);
             ladeposition=0;
             interrupts();
@@ -2096,10 +2102,12 @@ void loop()
             aktuelleladeposition &= 0x03;
             
             // aktuellen Abschnitt laden
-            aktuellelage = CNCDaten[aktuelleladeposition][25];
+            //aktuellelage = CNCDaten[aktuelleladeposition][25];
             //globalaktuelleladeposition = ladeposition;
-            aktuelleladeposition = ladeposition;
             
+            
+            //aktuelleladeposition = ladeposition;
+            aktuellelage = AbschnittLaden_4M(CNCDaten[aktuelleladeposition]);
             
             
             if (aktuellelage==2) // war letzter Abschnitt
@@ -2113,10 +2121,15 @@ void loop()
                // Neu: letzten Abschnitt melden
                
                 sendbuffer[0]=0xD0;
-                sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
-                sendbuffer[6]=abschnittnummer & 0x00FF;
+          //      sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+           //     sendbuffer[6]=abschnittnummer & 0x00FF;
                 
-                sendbuffer[8]=ladeposition & 0x00FF;
+           //     sendbuffer[8]=ladeposition & 0x00FF;
+               
+               sendbuffer[5]=abschnittnummer;
+               sendbuffer[6]=ladeposition;
+
+               
                 //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                sendbuffer[22] = cncstatus;
                 usb_rawhid_send((void*)sendbuffer, 50);
@@ -2384,6 +2397,7 @@ void loop()
    
 #pragma mark sendstatus
    //if (sendstatus >= 3)
+   sendstatus = 0;
    if (sendstatus > 0)
    {
       
