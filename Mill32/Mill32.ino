@@ -397,20 +397,11 @@ void delaytimerfunction(void) // 1us ohne ramp
 
 uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
 {
-   //OSZI_A_LO();
-   uint8_t l = sizeof(AbschnittDaten);
-   //  Serial.printf("\n*********                   AbschnittLaden_4M:  AbschnittDaten len: %d Motor: %d\n\n", l,AbschnittDaten[28]);
    stopTimer2();
+ //  lcd_gotoxy(15,0);
+ //  lcd_puts("    ");
+   
    uint8_t returnwert=0;
-   parallelstatus  |= (1<<THREAD_COUNT_BIT);
-   //   Serial.printf("AbschnittDaten\n");
-   //  for(int i=0;i<32;i++) // 5 us ohne printf, 10ms mit printf
-   { 
-      //         Serial.printf("%d \t",AbschnittDaten[i]);
-   }
-   //OSZI_A_HI();
-   //  rampstatus = 0;
-   //   Serial.printf("\n            end Abschnittdaten\n");
    
 #  pragma mark Reihenfolge der Daten
    /*         
@@ -2169,23 +2160,23 @@ void loop()
             
             if (aktuellelage==2) // war letzter Abschnitt
             {
-               //              Serial.printf("\tMotor A last Abschnitt\n");
+               Serial.printf("\tMotor A last Abschnitt\n");
                //noInterrupts();
                endposition=abschnittnummer; // letzter Abschnitt
                
-               /*
+               
                 // Neu: letzten Abschnitt melden
                 sendbuffer[0]=0xD0;
                 sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
                 sendbuffer[6]=abschnittnummer & 0x00FF;
-                sendbuffer[8]=ladeposition & 0x00FF;
+                //sendbuffer[8]=ladeposition & 0x00FF;
                 //   sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                 usb_rawhid_send((void*)sendbuffer, 50);
-                ringbufferstatus |= (1<<ENDBIT);
-                ringbufferstatus |= (1<<LASTBIT);
+            //    ringbufferstatus |= (1<<ENDBIT);
+            //    ringbufferstatus |= (1<<LASTBIT);
                 interrupts();
                 //endposition = 0xFFFF;
-                */
+                
                
             }
             else
@@ -2346,15 +2337,18 @@ void loop()
                
                
                // Neu: letzten Abschnitt melden
-               /*
+               
                 sendbuffer[0]=0xD0;
-                sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
-                sendbuffer[6]=abschnittnummer & 0x00FF;
+               // sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
+              //  sendbuffer[6]=abschnittnummer & 0x00FF;
                 
-                sendbuffer[8]=ladeposition & 0x00FF;
+               sendbuffer[5]=abschnittnummer;
+               sendbuffer[6]=ladeposition;
+
+                //sendbuffer[8]=ladeposition & 0x00FF;
                 //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
                 usb_rawhid_send((void*)sendbuffer, 50);
-                */
+                
                
             }  
             else 
