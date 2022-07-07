@@ -1427,7 +1427,7 @@ void loop()
 #pragma mark A5           
          case 0xA5: // 
          {
-    //        Serial.printf("A5\n");
+           Serial.printf("A5\n");
             uint8_t i=0;
             for(i=0;i<33;i++) // 5 us ohne printf, 10ms mit printf
             { 
