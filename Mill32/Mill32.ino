@@ -608,7 +608,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    
    startTimer2();
    
-   Serial.printf("\n\nAbschnittLaden_4M end\n\n");
+   //Serial.printf("\n\nAbschnittLaden_4M end\n");
     return returnwert;
  
 }
@@ -1621,7 +1621,7 @@ void loop()
 #pragma mark default 
          default: // CNC 
          {
-            Serial.printf("\n---  default   usb_recv_counter %d\t \nringbufferstatus: %02X position(buffer17): %02X device: %d \n",usb_recv_counter,ringbufferstatus, buffer[17],device);
+            Serial.printf("---  default   usb_recv_counter %d\t \nringbufferstatus: %02X position(buffer17): %02X device: %d \n",usb_recv_counter,ringbufferstatus, buffer[17],device);
             // Abschnittnummer bestimmen
             
             sendbuffer[24] =  buffer[32];
@@ -1654,9 +1654,9 @@ void loop()
             }
             //           Serial.printf("\n");
             
-            Serial.printf("\n****************************************\n");
+            //Serial.printf("\n****************************************\n");
             Serial.printf("default Abschnitt lage: %d abschnittnummer: %d\n",lage,abschnittnummer);
-            Serial.printf("****************************************\n");
+            //Serial.printf("****************************************\n");
                           
                         //              usb_rawhid_send((void*)sendbuffer, 50); // nicht jedes Paket melden
                         
@@ -1951,8 +1951,7 @@ void loop()
  //           motorstatus &= ~(1<< COUNT_B); 
  //           sendstatus |= (1<<COUNT_B); // Motor B auch markieren
          }
- //        Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d korrekturcounterx: %d korrekturcountery: %d StepCounterB: %d\n",abschnittnummer,korrekturcounterx, korrekturcountery,StepCounterB);
-         Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
+         //Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
          //        Serial.printf("Rampbreite: %d rampendstep: %d",rampbreite, rampendstep);
          
          // Begin Ringbuffer-Stuff
@@ -2082,14 +2081,10 @@ void loop()
 //            motorstatus &= ~(1<< COUNT_B); 
             sendstatus |= (1<<COUNT_A); // Motor A abgelaufen, auch markieren
          }
-         
-         // Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d",abschnittnummer);
-   //      Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d  StepCounterA: %d\n",abschnittnummer,endposition,StepCounterA);
-
-         Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterA, sendstatus);
+ 
+         //Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterA, sendstatus);
           
-         //         Serial.printf("\nMotor B StepCounterB abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterA: %d sendstatus: %d\n", abschnittnummer, endposition, ringbufferstatus,StepCounterA,sendstatus);
-         
+          
          // Begin Ringbuffer-Stuff
          
          if ((abschnittnummer==endposition) )
