@@ -145,6 +145,8 @@ volatile uint8_t           timerstatus=0;
 
 volatile uint8_t           status=0;
 
+volatile uint8_t           pfeilstatus=0;
+
 volatile uint8_t           PWM=0;
 static volatile uint8_t    pwmposition=0;
 static volatile uint8_t    pwmdivider=0;
@@ -1312,6 +1314,71 @@ void loop()
             
          
          }break;
+
+#pragma mark C0 Pfeiltaste              
+         case 0xC0:
+         {
+            Serial.printf("case C0\n");
+            sendbuffer[24] =  buffer[32];
+            
+            // Abschnittnummer bestimmen
+            uint8_t indexh=buffer[18];
+            uint8_t indexl=buffer[19];
+            uint8_t position = buffer[17];
+            Serial.printf("C0 position: %d\n",position);
+            abschnittnummer= indexh<<8;
+            abschnittnummer += indexl;
+            sendbuffer[0]=0xC2;
+            uint8_t lage = buffer[25];
+            uint8_t richtung = buffer[31];
+            Serial.printf("\n****************************************\n");
+            Serial.printf("C0 Abschnitt lage: %d abschnittnummer: %d richtung: %d\n",lage,abschnittnummer, richtung);
+            Serial.printf("****************************************\n");
+            ladeposition=0;
+            endposition=0xFFFF;
+            cncstatus = 0;
+            motorstatus = 0;
+            ringbufferstatus=0x00;
+            anschlagstatus=0;
+            ringbufferstatus |= (1<<FIRSTBIT);
+            ringbufferstatus |= (1<<STARTBIT);
+            AbschnittCounter=0;
+            endposition=abschnittnummer;
+            // Daten vom buffer in CNCDaten laden
+            {
+               uint8_t pos=(abschnittnummer);
+               pos &= 0x03; // 2 bit // Beschraenkung des index auf Buffertiefe 
+               //if (abschnittnummer>8)
+               {
+                  //lcd_putint1(pos);
+               }
+               uint8_t i=0;
+               for(i=0;i<USB_DATENBREITE;i++)
+               {
+                  CNCDaten[pos][i]=buffer[i];  
+               }
+               
+            }
+         
+         }break;
+          
+         case 0xC2:
+         {
+            Serial.printf("case C2\n");
+            uint8_t richtung = buffer[31];
+            Serial.printf("richtung: %d\n",richtung);
+            Serial.printf("StepCounterA: %d StepCounterB: %d StepCounterC: %d StepCounterD: %d \n",StepCounterA,StepCounterB,StepCounterC,StepCounterD);
+            StepCounterA = 0;
+            StepCounterB = 0;
+            StepCounterC = 0;
+            StepCounterD = 0;
+            ringbufferstatus = 0;
+            cncstatus = 0;
+            motorstatus = 0;
+
+            
+         }break;
+            
             
          case 0xCA:
          {
