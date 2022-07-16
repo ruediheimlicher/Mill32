@@ -31,17 +31,17 @@
  #define MB_RI           4
  #define MB_EN           5
  
- #define END_A0_PIN      6           // Bit fuer Endanschlag bei A0
- #define END_B0_PIN      7           // Bit fuer Endanschlag bei A1
+ #define END_A0_PIN      20           // Bit fuer Endanschlag bei A0
+ #define END_B0_PIN      21           // Bit fuer Endanschlag bei A1
  
 #define STROM              8
 #define DC_PWM               9
 
 // 10,11,12: SPI
- #define MD_STEP            17           // PIN auf Stepperport 2
+// #define MD_STEP            17           // PIN auf Stepperport 2
 // 18, 19: I2C
-#define MD_RI              20
-#define MD_EN              21
+//#define MD_RI              20
+//#define MD_EN              21
 
 #define END_C0_PIN         22           // Anschlagstatus:  Bit fuer Endanschlag bei C0
 #define END_D0_PIN         23           // Anschlagstatus:  Bit fuer Endanschlag bei D0

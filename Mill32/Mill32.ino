@@ -562,7 +562,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    
    CounterC = DelayC;
 
-   
+  /* 
    // Motor D
    digitalWriteFast(MD_EN,LOW);   //CounterD=0;
    dataL=0;
@@ -599,7 +599,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    DelayD += delayL;
    
    CounterD = DelayD;
-   
+   */
    // pwm-rate
    PWM = AbschnittDaten[20];
    
@@ -628,19 +628,19 @@ void AnschlagVonMotor(const uint8_t motor)
    {
       case 0:
       {
-         endPin = END_A0;
+         endPin = END_A0_PIN;
       }break;
       case 1:
       {
-         endPin = END_B0;
+         endPin = END_B0_PIN;
       }break;
       case 2:
       {
-         endPin = END_C0;
+         endPin = END_C0_PIN;
       }break;
       case 3:
       {
-         endPin = END_D0;
+         //endPin = END_D0;
       }break;
          
    }// switch motor
@@ -655,7 +655,6 @@ void AnschlagVonMotor(const uint8_t motor)
    else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag A0
    {         
       //   AnschlagVonMotor(0); // Bewegung anhalten
-      
       
       if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu         
       {
@@ -717,6 +716,8 @@ void AnschlagVonMotor(const uint8_t motor)
                   digitalWriteFast(MC_EN + motor + 2,HIGH);
                }
                
+               
+               
                // Alles abstellen
                StepCounterA=0;
                StepCounterB=0;
@@ -765,6 +766,26 @@ void AnschlagVonMotor(const uint8_t motor)
    }
 }
 
+void setPixel(int px,int py)
+{
+   Serial.printf("px: %d py: %d\n",px,py);
+}
+
+void
+plot_line (int x0, int y0, int x1, int y1)
+{
+  int dx =  abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
+  int dy = -abs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
+  int err = dx + dy, e2; /* error value e_xy */
+ 
+  for (;;){  /* loop */
+    setPixel (x0,y0);
+    if (x0 == x1 && y0 == y1) break;
+    e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+    if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+  }
+}
 
 
 
@@ -887,13 +908,16 @@ void setup()
    digitalWriteFast(MC_EN, HIGH); // HI
   
    // Stepper D
+   /*
    pinMode(MD_STEP, OUTPUT); // HI
    pinMode(MD_RI, OUTPUT); // HI
    pinMode(MD_EN, OUTPUT); // HI
    
+   
    digitalWriteFast(MD_STEP, HIGH); // HI
    digitalWriteFast(MD_RI, HIGH); // HI
    digitalWriteFast(MD_EN, HIGH); // HI
+    */
    
    pinMode(END_A0_PIN, INPUT); // 
    pinMode(END_B0_PIN, INPUT); // 
@@ -976,7 +1000,25 @@ void loop()
           lcd.setCursor(4,1);
           lcd.print(String(CounterB&0xFF));
           */
-         
+         /*
+         if (digitalRead(END_A0_PIN)) // Eingang ist HI, Schlitten nicht am Anschlag A0
+         {
+            Serial.printf("Anschlag Motor A OFF\n");
+         }
+          else 
+          {
+             Serial.printf("Anschlag Motor A ON\n");
+          }
+ 
+         if (digitalRead(END_B0_PIN)) // Eingang ist HI, Schlitten nicht am Anschlag A0
+         {
+            Serial.printf("Anschlag Motor B OFF\n");
+         }
+         else 
+         {
+            Serial.printf("Anschlag Motor B ON\n");
+         }
+*/
       }
       else
       {
@@ -1429,10 +1471,12 @@ void loop()
             CounterC=0;
             CounterD=0;
             
+            /*
             digitalWriteFast(MA_EN,HIGH);
             digitalWriteFast(MB_EN,HIGH);
             digitalWriteFast(MC_EN,HIGH);
             digitalWriteFast(MD_EN,HIGH);
+             */
             lcd.setCursor(0,1);
             lcd.print("HALT");
             
@@ -1838,7 +1882,7 @@ void loop()
    
    
    // Anschlagsituation abfragen
-   
+#pragma mark Anschlag   Motor A
    // ********************
    // * Anschlag Motor A *
    // ********************
@@ -1846,6 +1890,7 @@ void loop()
    
     if (digitalRead(END_A0_PIN)) // Eingang ist HI, Schlitten nicht am Anschlag A0
     {
+       
     if (anschlagstatus &(1<< END_A0)) // Schlitten war, aber ist nicht mehr am Anschlag
     {
     anschlagstatus &= ~(1<< END_A0); // Bit fuer Anschlag A0 zuruecksetzen
@@ -1853,9 +1898,11 @@ void loop()
     }
     else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag A0
     {         
-    AnschlagVonMotor(0); // Bewegung anhalten
+       //Serial.printf("Anschlag Motor A\n");
+       AnschlagVonMotor(0); // Bewegung anhalten
     }
     
+#pragma mark Anschlag   Motor B
    // **************************************
    // * Anschlag Motor B *
    // **************************************
@@ -1871,12 +1918,13 @@ void loop()
     }
     else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag B0
     {
-    AnschlagVonMotor(1);
+       //Serial.printf("Anschlag Motor B\n");
+       AnschlagVonMotor(1);
     } // end Anschlag B0
     
     // End Anschlag B
     
-   
+#pragma mark Anschlag   Motor C
    // ********************
    // * Anschlag Motor C *
    // ********************
@@ -1895,6 +1943,7 @@ void loop()
     AnschlagVonMotor(2);
     }
     
+#pragma mark Anschlag   Motor D
    // ***************
    // * Anschlag Motor D *
    // ***************
@@ -2314,7 +2363,7 @@ void loop()
    // **************************************
    // * Motor D *
    // **************************************
-   
+/*   
    if (StepCounterD && (CounterD == 0)&&(!(anschlagstatus & (1<< END_D0))))
    {
       noInterrupts();
@@ -2404,6 +2453,7 @@ void loop()
       }
       
    }
+ */
    
 #pragma mark sendstatus
    //if (sendstatus >= 3)
