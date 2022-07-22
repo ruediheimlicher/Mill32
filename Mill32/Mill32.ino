@@ -443,7 +443,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    int lage = 0;
    //   lage = AbschnittDaten[9]; // Start: 1, innerhalb: 0, Ende: 2
    lage = AbschnittDaten[17]; // Start: 1, innerhalb: 0, Ende: 2
-   Serial.printf("\n\nAbschnittLaden_4M lage: %d\n",lage);
+   Serial.printf("******* ********* AbschnittLaden_4M lage: %d\n",lage);
    if (lage & 0x01)
    {
       returnwert=1;
@@ -621,14 +621,16 @@ void AnschlagVonMotor(const uint8_t motor)
    //lcd_putc('A');
    //lcd_gotoxy(2+2*motor,1);
    //lcd_puthex(motor);
-   Serial.printf("*** AnschlagvonMotor: %d\n",motor);
+   //Serial.printf("*** AnschlagvonMotor: %d\n",motor);
    
    uint8_t endPin;
+   uint8_t endBit = 0;
    switch (motor)
    {
       case 0:
       {
          endPin = END_A0_PIN;
+         endBit = motor;
       }break;
       case 1:
       {
@@ -647,27 +649,34 @@ void AnschlagVonMotor(const uint8_t motor)
    
    if (digitalRead(endPin)) // Eingang ist HI, Schlitten nicht am Anschlag A0
    {
-      if (anschlagstatus &(1<< endPin)) // Schlitten war, aber ist nicht mehr am Anschlag
+      //if (anschlagstatus &(1<< endPin)) // Schlitten war, aber ist nicht mehr am Anschlag
+      if (anschlagstatus &(1<< motor)) // Schlitten war, aber ist nicht mehr am Anschlag
+
       {
-         anschlagstatus &= ~(1<< endPin); // Bit fuer Anschlag A0 zuruecksetzen
+         anschlagstatus &= ~(1<< motor); // Bit fuer Anschlag A0 zuruecksetzen
       }
    }
    else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag A0
    {         
       //   AnschlagVonMotor(0); // Bewegung anhalten
       
-      if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu         
+      //if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu         
+      if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu   (RICHTUNG_A ist 0)      
+
       {
          if (!(anschlagstatus &(1<< (END_A0 + motor))))
          {
             //cli();
-            anschlagstatus |= (1<< (END_A0 + motor));      // Bit fuer Anschlag A0+motor setzen
+            Serial.printf("*** Motor ist am anschlag angekommen: AnschlagvonMotor: %d\n",motor);
+            anschlagstatus |= (1<< (END_A0 + motor));      // Bit fuer Anschlag A0+motor setzen (END_A0 ist 4)
             //lcd_putc('A');
             if (cncstatus & (1<<GO_HOME)) // nur eigene Seite abstellen
             {
                // Paralleler Schlitten gleichzeitig am Anschlag?
                
+               Serial.printf("*** Anschlag Home motor %d\n",motor);
                //lcd_putc('B');
+               // code: 
                sendbuffer[0]=0xB5 + motor;
                
                cncstatus |= (1<<motor);
@@ -695,7 +704,7 @@ void AnschlagVonMotor(const uint8_t motor)
                }
                //cncstatus &= ~(1<<GO_HOME);
                
-            }
+            } // home
             else           // beide Seiten abstellen
             {    
                cncstatus=0;
@@ -704,9 +713,9 @@ void AnschlagVonMotor(const uint8_t motor)
                if (motor<2) // Stepperport 1
                {
                   //STEPPERPORT_1 |= (1<<(MA_EN + motor));     // Motor 0,1 OFF
-                  digitalWriteFast(MA_EN + motor,HIGH);
+                  digitalWriteFast(MA_EN,HIGH);
                   //STEPPERPORT_2 |= (1<<(MA_EN + motor + 2)); // Paralleler Motor 2,3 OFF
-                  digitalWriteFast(MA_EN + motor + 2,HIGH);
+                  digitalWriteFast(MB_EN + 2,HIGH);
                }
                else // Stepperport 2
                {
@@ -742,7 +751,7 @@ void AnschlagVonMotor(const uint8_t motor)
             sendbuffer[8]=ladeposition & 0x00FF;
             //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             sendbuffer[20]=cncstatus;
-//            usb_rawhid_send((void*)sendbuffer, 50);
+            usb_rawhid_send((void*)sendbuffer, 50);
              
             //ladeposition=0;
             // motorstatus=0;
@@ -1373,9 +1382,9 @@ void loop()
             sendbuffer[0]=0xC2;
             uint8_t lage = buffer[25];
             uint8_t richtung = buffer[31];
-            Serial.printf("\n****************************************\n");
-            Serial.printf("C0 Abschnitt lage: %d abschnittnummer: %d richtung: %d\n",lage,abschnittnummer, richtung);
-            Serial.printf("****************************************\n");
+            //Serial.printf("\n****************************************\n");
+            //Serial.printf("C0 Abschnitt lage: %d abschnittnummer: %d richtung: %d\n",lage,abschnittnummer, richtung);
+            //Serial.printf("****************************************\n");
             ladeposition=0;
             endposition=0xFFFF;
             cncstatus = 0;
@@ -1599,16 +1608,14 @@ void loop()
             sendbuffer[0]=0xF2;
             //         usb_rawhid_send((void*)sendbuffer, 50);
             sendbuffer[0]=0x00;
+            Serial.printf("F1 reset end\n");
             
          }break;
             
    // MARK: F0
       case 0xF0:// cncstatus fuer go_home setzen
          {
-          //  lcd_cls();
-          //  lcd_gotoxy(0,0);
-          //  lcd_puts("HOME");
-            
+            Serial.printf("home\n");
           //  gohome();
           //  break;
             abschnittnummer = 0; // diff 220520
@@ -1620,14 +1627,13 @@ void loop()
             ringbufferstatus=0x00;
             anschlagstatus=0;
             ringbufferstatus |= (1<<FIRSTBIT);
-  //          ringbufferstatus |= (1<<STARTBIT); // diff 220520
-
+            ringbufferstatus |= (1<<STARTBIT); // diff 220520, Start 
+            uint8_t lage = buffer[17];
             AbschnittCounter=0;
             //sendbuffer[8]= versionintl;
             //sendbuffer[8]= versioninth;
 
-            sendbuffer[0]=0xF0;
-            //sendbuffer[0]=0x45;
+            sendbuffer[0]=0xF1;
             cncstatus |= (1<<GO_HOME); // Bit fuer go_home setzen
             sendbuffer[22] = cncstatus;
             
@@ -1661,7 +1667,7 @@ void loop()
          }break;
      
             
-            
+             
 #pragma mark default 
          default: // CNC 
          {
