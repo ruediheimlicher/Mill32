@@ -125,7 +125,8 @@ volatile uint16_t korrekturcountery = 0;
 
 volatile uint8_t vorzeichen = 0;
 
-
+uint8_t steps = 48;
+uint8_t micro = 1;
 
 volatile uint16_t           loadtime= 0;
 
@@ -438,12 +439,22 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
     
     21   motorstatus // relevanter Motor fuer Abschnitt
     
-    22   Strom ON
+ //   22   Strom ON  // nicht verwendet, mit pwm gesteuert
+    22   zoomfaktor
+    
+    25   steps
+    26   micro
+    
     */         
+   
+   steps = AbschnittDaten[25];
+   micro = AbschnittDaten[26];
+   
+   Serial.printf("AbschnittLaden_4M steps: %d micro: %d\n",steps,micro);
    int lage = 0;
    //   lage = AbschnittDaten[9]; // Start: 1, innerhalb: 0, Ende: 2
    lage = AbschnittDaten[17]; // Start: 1, innerhalb: 0, Ende: 2
-   Serial.printf("******* ********* AbschnittLaden_4M lage: %d\n",lage);
+   //Serial.printf("******* ********* AbschnittLaden_4M lage: %d\n",lage);
    if (lage & 0x01)
    {
       returnwert=1;
@@ -485,6 +496,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterA = dataH;      // HByte
    StepCounterA <<= 8;        // shift 8
    StepCounterA += dataL;     // +LByte
+   
    
    delayL=AbschnittDaten[4];
    delayH=AbschnittDaten[5];
@@ -1068,7 +1080,7 @@ void loop()
       //     lcd.print(String(code));
       uint8_t device = buffer[32];
       
-      Serial.printf("----------------------------------->    rawhid_recv code: %02X device: %d\n",code, device);
+      Serial.printf("----------------------------------->    rawhid_recv code: %02X device: %d",code, device);
       for(uint8_t i=0;i<36;i++) // 5 us ohne printf, 10ms mit printf
       { 
  //        Serial.printf("%d %d \n",i,buffer[i]);
@@ -1671,7 +1683,7 @@ void loop()
 #pragma mark default 
          default: // CNC 
          {
-            Serial.printf("---  default   usb_recv_counter %d\t \nringbufferstatus: %02X position(buffer17): %02X device: %d \n",usb_recv_counter,ringbufferstatus, buffer[17],device);
+            //Serial.printf("---  default   usb_recv_counter %d\t \nringbufferstatus: %02X position(buffer17): %02X device: %d \n",usb_recv_counter,ringbufferstatus, buffer[17],device);
             // Abschnittnummer bestimmen
             
             sendbuffer[24] =  buffer[32];
@@ -1680,7 +1692,7 @@ void loop()
             uint8_t indexh=buffer[18];
             uint8_t indexl=buffer[19];
             uint8_t position = buffer[17];
-            Serial.printf("default position: %d\n",position);
+            //Serial.printf("default position: %d\n",position);
             
             abschnittnummer= indexh<<8;
             abschnittnummer += indexl;
@@ -1705,7 +1717,7 @@ void loop()
             //           Serial.printf("\n");
             
             //Serial.printf("\n****************************************\n");
-            Serial.printf("default Abschnitt lage: %d abschnittnummer: %d\n",lage,abschnittnummer);
+            //Serial.printf("default Abschnitt lage: %d abschnittnummer: %d\n",lage,abschnittnummer);
             //Serial.printf("****************************************\n");
                           
                         //              usb_rawhid_send((void*)sendbuffer, 50); // nicht jedes Paket melden
@@ -2262,7 +2274,7 @@ void loop()
       // Wenn StepCounterC abgelaufen und relevant: next Datenpaket abrufen
       if (StepCounterC ==0 && (motorstatus & (1<< COUNT_C)))    // Motor A ist relevant fuer Stepcount 
       {
-         Serial.printf("\nMotor C StepCounterC abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d  sendstatus: \n", abschnittnummer, endposition, ringbufferstatus,  sendstatus);
+         //Serial.printf("\nMotor C StepCounterC abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d  sendstatus: \n", abschnittnummer, endposition, ringbufferstatus,  sendstatus);
          // Begin Ringbuffer-Stuff
          //if (ringbufferstatus & (1<<ENDBIT))
          
