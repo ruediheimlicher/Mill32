@@ -125,7 +125,7 @@ volatile uint16_t korrekturcountery = 0;
 
 volatile uint8_t vorzeichen = 0;
 
-uint8_t steps = 48;
+uint8_t motorsteps = 48;
 uint8_t micro = 1;
 
 volatile uint16_t           loadtime= 0;
@@ -245,55 +245,6 @@ void stopTimer2(void)
    timerstatus &= ~(1<<TIMER_ON);
 }
 
-void timerfunction() 
-{ 
-   if (timerstatus & (1<<TIMER_ON))
-   {
-      if (PWM) // Draht soll heiss sein. 
-      {
-      }
-      else
-      {
-         pwmposition =0;
-      }
-      
-      //  if (timer2Counter >= 14) 
-      {
-         
-         if(CounterA)
-         {
-            CounterA-=1;
-         }
-         if(CounterB)
-         {
-            CounterB-=1;
-         }
-         if(CounterC)
-         {
-            CounterC-=1;
-         }
-         if(CounterD)
-         {
-            CounterD-=1;
-         }
-         
-         if (PWM)
-         {
-            pwmposition ++;
-         }
-         else
-         {
-            pwmposition =0;
-         }
-         
-         //      timer2Counter = 0; 
-         //OSZI_B_TOGG ;
-      } 
-   } // if timerstatus
-//   digitalWrite(OSZI_PULS_A, !digitalRead(OSZI_PULS_A));
-  // TCNT2 = 10;                     // ergibt 2 kHz fuer Timertakt
-}
-
 void delaytimerfunction(void) // 1us ohne ramp
 { 
   // digitalWrite(OSZI_PULS_A, !digitalRead(OSZI_PULS_A));
@@ -320,6 +271,7 @@ void delaytimerfunction(void) // 1us ohne ramp
             CounterD-=1;
          }
          
+         /*
          if (PWM)
          {
             pwmposition ++;
@@ -328,7 +280,7 @@ void delaytimerfunction(void) // 1us ohne ramp
          {
             pwmposition =0;
          }
-         
+         */
          //      timer2Counter = 0; 
          //OSZI_B_TOGG ;
       } 
@@ -447,10 +399,16 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
     
     */         
    
-   steps = AbschnittDaten[25];
+   motorsteps = AbschnittDaten[25];
    micro = AbschnittDaten[26];
+   // pwm-rate
+   PWM = AbschnittDaten[20];
+   Serial.printf("AbschnittLaden_4M steps: %d micro: %d PWM: %d\n",steps,micro,PWM);
+
+   analogWrite(DC_PWM, PWM);
    
-   Serial.printf("AbschnittLaden_4M steps: %d micro: %d\n",steps,micro);
+   
+ //  Serial.printf("AbschnittLaden_4M steps: %d micro: %d\n",steps,micro);
    int lage = 0;
    //   lage = AbschnittDaten[9]; // Start: 1, innerhalb: 0, Ende: 2
    lage = AbschnittDaten[17]; // Start: 1, innerhalb: 0, Ende: 2
@@ -497,6 +455,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterA <<= 8;        // shift 8
    StepCounterA += dataL;     // +LByte
    
+   StepCounterA *= micro;
    
    delayL=AbschnittDaten[4];
    delayH=AbschnittDaten[5];
@@ -505,6 +464,8 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    DelayA = delayH;
    DelayA <<= 8;
    DelayA += delayL;
+   
+   //DelayA *= micro;
    
    CounterA = DelayA;
    
@@ -531,7 +492,10 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterB <<= 8;      // shift 8
    StepCounterB += dataL;   // +LByte
    
+   StepCounterB *= micro;
+   
    DelayB = (AbschnittDaten[7]<<8)+ AbschnittDaten[6];
+   //DelayB  *= micro;
    
    CounterB = DelayB;
    
@@ -564,6 +528,7 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterC <<= 8;      // shift 8
    StepCounterC += dataL;   // +LByte
    
+   StepCounterC  *= micro;
    
    delayL=AbschnittDaten[12];
    delayH=AbschnittDaten[13];
@@ -571,6 +536,8 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    DelayC = delayH;
    DelayC <<=8;
    DelayC += delayL;
+   
+   //DelayC  *= micro;
    
    CounterC = DelayC;
 
@@ -603,18 +570,19 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    StepCounterD <<= 8;      // shift 8
    StepCounterD += dataL;   // +LByte
    
+   StepCounterD  *= micro;
+   
    delayL=AbschnittDaten[14];
    delayH=AbschnittDaten[15];
    
    DelayD = delayH;
    DelayD <<= 8;
    DelayD += delayL;
+   //DelayD  *= micro;
    
    CounterD = DelayD;
    */
-   // pwm-rate
-   PWM = AbschnittDaten[20];
-   
+    
    // motorstatus: welcher Motor ist relevant
    motorstatus = AbschnittDaten[21];
    
@@ -671,7 +639,8 @@ void AnschlagVonMotor(const uint8_t motor)
    else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag A0
    {         
       //   AnschlagVonMotor(0); // Bewegung anhalten
-      
+      // Strom OFF
+      analogWrite(DC_PWM, 0);
       //if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu         
       if (richtung & (1<<(RICHTUNG_A + motor))) // Richtung ist auf Anschlag A0 zu   (RICHTUNG_A ist 0)      
 
@@ -760,8 +729,9 @@ void AnschlagVonMotor(const uint8_t motor)
             sendbuffer[5]=(abschnittnummer & 0xFF00) >> 8;;
             sendbuffer[6]=abschnittnummer & 0x00FF;
 
+            sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             sendbuffer[8]=ladeposition & 0x00FF;
-            //sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
+            //
             sendbuffer[20]=cncstatus;
             usb_rawhid_send((void*)sendbuffer, 50);
              
@@ -889,10 +859,11 @@ void setup()
 
 
    pinMode(DC_PWM, OUTPUT);
-   digitalWriteFast(DC_PWM, HIGH); // OFF
-   
-   pinMode(STROM, OUTPUT);
-   digitalWriteFast(STROM, LOW); // LO, OFF
+   //digitalWriteFast(DC_PWM, HIGH); // OFF
+   digitalWriteFast(DC_PWM,0);
+                    
+//   pinMode(STROM, OUTPUT);
+//   digitalWriteFast(STROM, LOW); // LO, OFF
    
    
    // init Pins
@@ -994,6 +965,8 @@ void loop()
    
    if (sinceblink > 1000) 
    {  
+      //PWM = 55;
+      //analogWrite(DC_PWM, PWM);
       //scanI2C(100000);
       loopLED++;
       sinceblink = 0;
@@ -1141,7 +1114,7 @@ void loop()
                
             }
             
-            sendbuffer[8]=ladeposition & 0x00FF;
+            sendbuffer[7]=ladeposition& 0xFF00) >> 8;
             sendbuffer[8]=ladeposition & 0x00FF;
             
             sendbuffer[10]=(endposition & 0xFF00) >> 8;
@@ -1479,8 +1452,9 @@ void loop()
             
             AbschnittCounter=0;
             PWM = sendbuffer[29];
-            digitalWriteFast(DC_PWM,HIGH);
+            //digitalWriteFast(DC_PWM,HIGH);
             
+            analogWrite(DC_PWM, 0);
             
             StepCounterA=0;
             StepCounterB=0;
@@ -1515,7 +1489,12 @@ void loop()
             if (PWM==0) // OFF
             {
                //CMD_PORT &= ~(1<<DC_PWM);
-               digitalWriteFast(DC_PWM,LOW);
+               //digitalWriteFast(DC_PWM,LOW);
+               digitalWriteFast(DC_PWM,0);
+            }
+            else 
+            {
+               digitalWriteFast(DC_PWM, PWM);
             }
             parallelstatus |= (1<<THREAD_COUNT_BIT);
             
@@ -1584,7 +1563,8 @@ void loop()
             
             AbschnittCounter=0;
             PWM = 0;
-            digitalWriteFast(DC_PWM,LOW);
+            //digitalWriteFast(DC_PWM,LOW);
+            analogWrite(DC_PWM, 0);
             
             StepCounterA=0;
             StepCounterB=0;
@@ -1604,6 +1584,8 @@ void loop()
             
             digitalWriteFast(MA_STEP,HIGH);
             digitalWriteFast(MB_STEP,HIGH);
+            
+            
             
             //           lcd.setCursor(0,1);
             //           lcd.print("reset\n");
@@ -1630,6 +1612,10 @@ void loop()
             Serial.printf("home\n");
           //  gohome();
           //  break;
+            
+            // Strom OFF
+            analogWrite(DC_PWM, 0);
+            
             abschnittnummer = 0; // diff 220520
             
             ladeposition=0;
@@ -2018,8 +2004,6 @@ void loop()
  //           motorstatus &= ~(1<< COUNT_B); 
  //           sendstatus |= (1<<COUNT_B); // Motor B auch markieren
          }
-         //Serial.printf("\nMotor A StepCounterA abgelaufen abschnittnummer: %d endposition: %d ringbufferstatus: %d StepCounterB: %d sendstatus: %d \n", abschnittnummer, endposition, ringbufferstatus, StepCounterB, sendstatus);
-         //        Serial.printf("Rampbreite: %d rampendstep: %d",rampbreite, rampendstep);
          
          // Begin Ringbuffer-Stuff
          
@@ -2046,6 +2030,7 @@ void loop()
             
             usb_rawhid_send((void*)sendbuffer, 50);
             ladeposition=0;
+            analogWrite(DC_PWM, 0);
             sei();
          }
          else 

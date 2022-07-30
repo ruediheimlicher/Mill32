@@ -34,8 +34,8 @@
  #define END_A0_PIN      20           // Bit fuer Endanschlag bei A0
  #define END_B0_PIN      21           // Bit fuer Endanschlag bei A1
  
-#define STROM              8
-#define DC_PWM               9
+//#define STROM              8
+#define DC_PWM              22
 
 // 10,11,12: SPI
 // #define MD_STEP            17           // PIN auf Stepperport 2
@@ -43,8 +43,8 @@
 //#define MD_RI              20
 //#define MD_EN              21
 
-#define END_C0_PIN         22           // Anschlagstatus:  Bit fuer Endanschlag bei C0
-#define END_D0_PIN         23           // Anschlagstatus:  Bit fuer Endanschlag bei D0
+#define END_C0_PIN         18           // Anschlagstatus:  Bit fuer Endanschlag bei C0
+#define END_D0_PIN         19           // Anschlagstatus:  Bit fuer Endanschlag bei D0
 
 
 
