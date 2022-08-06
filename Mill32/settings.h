@@ -16,9 +16,9 @@
 
 
  // neu 200730
- #define MC_STEP   14
- #define MC_RI   15
- #define MC_EN   16
+ #define MC_STEP        14
+ #define MC_RI          15
+ #define MC_EN          16
  
  //Pins 
 
@@ -34,7 +34,6 @@
  #define END_A0_PIN      20           // Bit fuer Endanschlag bei A0
  #define END_B0_PIN      21           // Bit fuer Endanschlag bei A1
  
-//#define STROM              8
 #define DC_PWM              22
 
 // 10,11,12: SPI

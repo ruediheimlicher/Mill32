@@ -54,6 +54,10 @@
 //#include <i2c_t3.h>
 #include <LiquidCrystal_I2C.h> // auch in Makefile angeben!!!
 //#include <TeensyThreads.h>
+
+#include "bresenham.h"
+
+
 // Set parameters
 
 
@@ -860,7 +864,7 @@ void setup()
 
    pinMode(DC_PWM, OUTPUT);
    //digitalWriteFast(DC_PWM, HIGH); // OFF
-   digitalWriteFast(DC_PWM,0);
+   digitalWriteFast(DC_PWM,1);
                     
 //   pinMode(STROM, OUTPUT);
 //   digitalWriteFast(STROM, LOW); // LO, OFF
@@ -927,6 +931,7 @@ void setup()
       digitalWriteFast(OSZI_PULS_A, HIGH); 
    }
    
+    
    delay(100);
    lcd.init();
    delay(100);
@@ -1114,7 +1119,7 @@ void loop()
                
             }
             
-            sendbuffer[7]=ladeposition& 0xFF00) >> 8;
+            sendbuffer[7]=(ladeposition & 0xFF00) >> 8;
             sendbuffer[8]=ladeposition & 0x00FF;
             
             sendbuffer[10]=(endposition & 0xFF00) >> 8;
@@ -1480,22 +1485,15 @@ void loop()
             Serial.printf("E0 Stop END\n");
          }break;
             
-            
+#pragma mark E2 DC              
          case 0xE2: // DC_PWM ON_OFF: Temperatur Schneiddraht setzen
          {
             
             PWM = buffer[20];
             Serial.printf("E2 setPWM: %d\n",PWM);
-            if (PWM==0) // OFF
-            {
-               //CMD_PORT &= ~(1<<DC_PWM);
-               //digitalWriteFast(DC_PWM,LOW);
-               digitalWriteFast(DC_PWM,0);
-            }
-            else 
-            {
-               digitalWriteFast(DC_PWM, PWM);
-            }
+            analogWrite(DC_PWM, PWM);
+            //analogWrite(9,PWM);
+            
             parallelstatus |= (1<<THREAD_COUNT_BIT);
             
             sendbuffer[0]=0xE3;
@@ -1705,130 +1703,130 @@ void loop()
             //Serial.printf("\n****************************************\n");
             //Serial.printf("default Abschnitt lage: %d abschnittnummer: %d\n",lage,abschnittnummer);
             //Serial.printf("****************************************\n");
-                          
-                        //              usb_rawhid_send((void*)sendbuffer, 50); // nicht jedes Paket melden
-                        
-                        if (abschnittnummer==0)
-                        {
-                           //anschlagstatus &= ~(1<< END_A0); // 220518 diff
-                           //  lcd_clr_line(1);
-                           cli();
-                           /*
-                            uint8_t i=0,k=0;
-                            for (k=0;k<RINGBUFFERTIEFE;k++)
-                            {
-                            for(i=0;i<USB_DATENBREITE;i++)
-                            {
-                            CNCDaten[k][i]=0;  
-                            }
-                            }
-                            */
-                           //CNCDaten = {};
-                           
-                           
-                           ladeposition=0;
-                           endposition=0xFFFF;
-                           cncstatus = 0;
-                           motorstatus = 0;
-                           ringbufferstatus=0x00;
-                           anschlagstatus=0;
-                           ringbufferstatus |= (1<<FIRSTBIT);
-                           AbschnittCounter=0;
-                           //sendbuffer[8]= versionintl;
-                           //sendbuffer[8]= versioninth;
-                           sendbuffer[5]=0x00;
-                           
-                           //in teensy3.2: timerintervall
-                           //                sendbuffer[8] = (TIMERINTERVALL & 0xFF00)>>8;
-                           //                sendbuffer[9] = (TIMERINTERVALL & 0x00FF);
-                           sendbuffer[0]=0xD1;
-                           
-                           //         usb_rawhid_send((void*)sendbuffer, 50);
-                           startTimer2();
-                           sei();
-                           
-                        }
-                        else
-                        {
-                           
-                        }
-                        
-                        //             if (buffer[9]& 0x02)// letzter Abschnitt
-                        
-                        if (buffer[17]& 0x02)// letzter Abschnitt
-                        {
-                           Serial.printf("default last Abschnitt: %d\n",buffer[17]);
-                           ringbufferstatus |= (1<<LASTBIT);
-                           if (ringbufferstatus & (1<<FIRSTBIT)) // nur ein Abschnitt
-                           {
-                              Serial.printf("default last Abschnitt: nur ein Abschnitt.\n");
-                              endposition=abschnittnummer; // erster ist letzter Abschnitt
-                           }
-                        }
-                        
-                        
-                        
-                        // Daten vom buffer in CNCDaten laden
-                        {
-                           uint8_t pos=(abschnittnummer);
-                           pos &= 0x03; // 2 bit // Beschraenkung des index auf Buffertiefe 
-                           //if (abschnittnummer>8)
-                           {
-                              //lcd_putint1(pos);
-                           }
-                           uint8_t i=0;
-                           for(i=0;i<USB_DATENBREITE;i++)
-                           {
-                              CNCDaten[pos][i]=buffer[i];  
-                           }
-                           
-                        }
-                        
-                        
-                        // Erster Abschnitt, mehrere Abschnitte: naechsten Abschnitt laden
-                        if ((abschnittnummer == 0)&&(endposition))
-                        {
-                           {
-                              //lcd_putc('*');
-                              // Version zurueckmelden
-                              
-                              
-                              //versionl=VERSION & 0xFF;
-                              //versionh=((VERSION >> 8) & 0xFF);
-                              
-                              
-                              
-                              
-                              
-                              sendbuffer[5]=abschnittnummer;
-                              sendbuffer[6]=ladeposition;
-                              sendbuffer[0]=0xAF;
-                              usb_rawhid_send((void*)sendbuffer, 50);
-                              sei();
-                              //  sendbuffer[0]=0x00;
-                              //  sendbuffer[5]=0x00;
-                              //  sendbuffer[6]=0x00;
-                              
-                              
-                           }  
-                        }
-                        
-                        ringbufferstatus &= ~(1<<FIRSTBIT);
-                        
-                        // Ringbuffer ist voll oder  letzter Abschnitt schon erreicht
-                         
-                        if ((abschnittnummer ==1 )||((abschnittnummer ==0 )&&(ringbufferstatus & (1<<LASTBIT)))) 
-                        {
-                           {
-                              ringbufferstatus &= ~(1<<LASTBIT);
-                              ringbufferstatus |= (1<<STARTBIT);
-                              
-                           }
-                        }
-                        
-                  //   } // default
-                        
-              
+            
+            //              usb_rawhid_send((void*)sendbuffer, 50); // nicht jedes Paket melden
+            
+            if (abschnittnummer==0)
+            {
+               //anschlagstatus &= ~(1<< END_A0); // 220518 diff
+               //  lcd_clr_line(1);
+               cli();
+               /*
+                uint8_t i=0,k=0;
+                for (k=0;k<RINGBUFFERTIEFE;k++)
+                {
+                for(i=0;i<USB_DATENBREITE;i++)
+                {
+                CNCDaten[k][i]=0;  
+                }
+                }
+                */
+               //CNCDaten = {};
+               
+               
+               ladeposition=0;
+               endposition=0xFFFF;
+               cncstatus = 0;
+               motorstatus = 0;
+               ringbufferstatus=0x00;
+               anschlagstatus=0;
+               ringbufferstatus |= (1<<FIRSTBIT);
+               AbschnittCounter=0;
+               //sendbuffer[8]= versionintl;
+               //sendbuffer[8]= versioninth;
+               sendbuffer[5]=0x00;
+               
+               //in teensy3.2: timerintervall
+               //                sendbuffer[8] = (TIMERINTERVALL & 0xFF00)>>8;
+               //                sendbuffer[9] = (TIMERINTERVALL & 0x00FF);
+               sendbuffer[0]=0xD1;
+               
+               //         usb_rawhid_send((void*)sendbuffer, 50);
+               startTimer2();
+               sei();
+               
+            }
+            else
+            {
+               
+            }
+            
+            //             if (buffer[9]& 0x02)// letzter Abschnitt
+            
+            if (buffer[17]& 0x02)// letzter Abschnitt
+            {
+               Serial.printf("default last Abschnitt: %d\n",buffer[17]);
+               ringbufferstatus |= (1<<LASTBIT);
+               if (ringbufferstatus & (1<<FIRSTBIT)) // nur ein Abschnitt
+               {
+                  Serial.printf("default last Abschnitt: nur ein Abschnitt.\n");
+                  endposition=abschnittnummer; // erster ist letzter Abschnitt
+               }
+            }
+            
+            
+            
+            // Daten vom buffer in CNCDaten laden
+            {
+               uint8_t pos=(abschnittnummer);
+               pos &= 0x03; // 2 bit // Beschraenkung des index auf Buffertiefe 
+               //if (abschnittnummer>8)
+               {
+                  //lcd_putint1(pos);
+               }
+               uint8_t i=0;
+               for(i=0;i<USB_DATENBREITE;i++)
+               {
+                  CNCDaten[pos][i]=buffer[i];  
+               }
+               
+            }
+            
+            
+            // Erster Abschnitt, mehrere Abschnitte: naechsten Abschnitt laden
+            if ((abschnittnummer == 0)&&(endposition))
+            {
+               {
+                  //lcd_putc('*');
+                  // Version zurueckmelden
+                  
+                  
+                  //versionl=VERSION & 0xFF;
+                  //versionh=((VERSION >> 8) & 0xFF);
+                  
+                  
+                  
+                  
+                  
+                  sendbuffer[5]=abschnittnummer;
+                  sendbuffer[6]=ladeposition;
+                  sendbuffer[0]=0xAF;
+                  usb_rawhid_send((void*)sendbuffer, 50);
+                  sei();
+                  //  sendbuffer[0]=0x00;
+                  //  sendbuffer[5]=0x00;
+                  //  sendbuffer[6]=0x00;
+                  
+                  
+               }  
+            }
+            
+            ringbufferstatus &= ~(1<<FIRSTBIT);
+            
+            // Ringbuffer ist voll oder  letzter Abschnitt schon erreicht
+            
+            if ((abschnittnummer ==1 )||((abschnittnummer ==0 )&&(ringbufferstatus & (1<<LASTBIT)))) 
+            {
+               {
+                  ringbufferstatus &= ~(1<<LASTBIT);
+                  ringbufferstatus |= (1<<STARTBIT);
+                  
+               }
+            }
+            
+            //   } // default
+            
+            
             
             
          }break; // default
