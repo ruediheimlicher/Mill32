@@ -37,13 +37,13 @@
 #define DC_PWM              22
 
 // 10,11,12: SPI
-// #define MD_STEP            17           // PIN auf Stepperport 2
+ #define MD_STEP            14           // PIN auf Stepperport 2
 // 18, 19: I2C
-//#define MD_RI              20
-//#define MD_EN              21
+#define MD_RI              15
+#define MD_EN              16
 
-#define END_C0_PIN         18           // Anschlagstatus:  Bit fuer Endanschlag bei C0
-#define END_D0_PIN         19           // Anschlagstatus:  Bit fuer Endanschlag bei D0
+#define END_C0_PIN         11 //18           // Anschlagstatus:  Bit fuer Endanschlag bei C0
+#define END_D0_PIN         12 //19           // Anschlagstatus:  Bit fuer Endanschlag bei D0
 
 
 
