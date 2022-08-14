@@ -1006,7 +1006,7 @@ void loop()
          /*
          if (digitalRead(END_A0_PIN)) // Eingang ist HI, Schlitten nicht am Anschlag A0
          {
-            Serial.printf("Anschlag Motor A OFF\n");
+            //Serial.printf("Anschlag Motor A OFF\n");
          }
           else 
           {
@@ -1906,7 +1906,7 @@ void loop()
     }
     else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag A0
     {         
-       Serial.printf("Anschlag Motor A\n");
+       //Serial.printf("Anschlag Motor A\n");
        AnschlagVonMotor(0); // Bewegung anhalten
     }
     
@@ -1926,7 +1926,7 @@ void loop()
     }
     else // Schlitten bewegte sich auf Anschlag zu und ist am Anschlag B0
     {
-       Serial.printf("Anschlag Motor B\n");
+      // Serial.printf("Anschlag Motor B\n");
        AnschlagVonMotor(1);
     } // end Anschlag B0
     
