@@ -136,4 +136,39 @@
 #define VORZEICHEN_X   0
 #define VORZEICHEN_Y   1
 
+
+// Zeichnen
+#define ACHSE0_BYTE_H   0
+#define ACHSE0_BYTE_L   1
+#define ACHSE0_START_BYTE_H   2
+#define ACHSE0_START_BYTE_L   3
+
+ 
+#define ACHSE1_BYTE_H   4
+#define ACHSE1_BYTE_L   5
+#define ACHSE1_START_BYTE_H   6
+#define ACHSE1_START_BYTE_L   7
+
+#define ACHSE2_BYTE_H   8
+#define ACHSE2_BYTE_L   9
+#define ACHSE2_START_BYTE_H   10
+#define ACHSE2_START_BYTE_L   11
+
+#define  ACHSE3_BYTE_H  12
+#define  ACHSE3_BYTE_L  13
+
+#define  INDEX_BYTE_H  18
+#define  INDEX_BYTE_L  19
+
+
+/*
+#define  HYP_BYTE_H  22 // Hypotenuse
+#define  HYP_BYTE_L 23
+
+
+#define  STEPS_BYTE_H  26
+#define  STEPS_BYTE_L  27
+*/
+
+
 #endif /* settings_h */

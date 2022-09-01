@@ -455,9 +455,11 @@ uint8_t  AbschnittLaden_4M(const uint8_t* AbschnittDaten) // 22us
    }
    
    dataH &= (0x7F);
-   StepCounterA = dataH;      // HByte
-   StepCounterA <<= 8;        // shift 8
-   StepCounterA += dataL;     // +LByte
+//   StepCounterA = dataH;      // HByte
+ //  StepCounterA <<= 8;        // shift 8
+ //  StepCounterA += dataL;     // +LByte
+   
+   StepCounterA = dataL | (dataH << 8); 
    
    StepCounterA *= micro;
    
@@ -1065,7 +1067,7 @@ void loop()
       Serial.printf("\n----------------------------------->    rawhid_recv code: %02X device: %d\n",code, device);
       for(uint8_t i=0;i<27;i++) // 5 us ohne printf, 10ms mit printf
       { 
-         Serial.printf("%d \t",buffer[i]);
+ //        Serial.printf("%d \t",buffer[i]);
       }
 
       Serial.printf("\n");
@@ -1489,6 +1491,20 @@ void loop()
             Serial.printf("E0 Stop END\n");
          }break;
             
+#pragma mark D2 zeichnen
+         case 0xD2:
+         {
+            uint16_t wegindex = (buffer[INDEX_BYTE_H] << 8) | buffer[INDEX_BYTE_L];
+            Serial.printf("D2 wegindex: %d\n",wegindex);
+            uint16_t x0 = (buffer[ACHSE0_BYTE_H] << 8) | buffer[ACHSE0_BYTE_H];
+            uint16_t y0 = (buffer[ACHSE1_BYTE_H] << 8) | buffer[ACHSE1_BYTE_H];
+            Serial.printf("D2 x0: %d y0: %d \n",x0,y0);
+         
+         }break;
+            
+            
+            
+            
 #pragma mark E2 DC              
          case 0xE2: // DC_PWM ON_OFF: Temperatur Schneiddraht setzen
          {
@@ -1867,10 +1883,12 @@ void loop()
       
       // Abschnitt 0 laden
       uint8_t l = sizeof(CNCDaten[ladeposition]);
+      
 #pragma mark default Ersten Abschnitt laden
-//      Serial.printf("+++ Ersten Abschnitt laden AbschnittLaden_4M len: %d ringbufferstatus: %d\n",l,ringbufferstatus);
+      
+      //      Serial.printf("+++ Ersten Abschnitt laden AbschnittLaden_4M len: %d ringbufferstatus: %d\n",l,ringbufferstatus);
       uint8_t lage=AbschnittLaden_4M(CNCDaten[ladeposition]); // erster Wert im Ringbuffer
-  //    Serial.printf("+++ Erster Abschnitt lage: %d\n",lage);
+      //    Serial.printf("+++ Erster Abschnitt lage: %d\n",lage);
       ladeposition++;
       if (lage==2) // nur ein Abschnitt
       {
@@ -1882,7 +1900,7 @@ void loop()
       
       interrupts();
       //      startTimer2();
-//      Serial.printf("motorstatus: %d\n",motorstatus);
+      //      Serial.printf("motorstatus: %d\n",motorstatus);
    }
    
 #pragma mark Anschlag

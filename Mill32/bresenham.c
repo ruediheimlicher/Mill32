@@ -15,7 +15,7 @@ plot_line (int x0, int y0, int x1, int y1)
    int sx = x0 < x1 ? 1 : -1;
    int dy = -abs (y1 - y0);
    int sy = y0 < y1 ? 1 : -1; 
-   int err = dx + dy /* error value e_xy */
+   int err = dx + dy; /* error value e_xy */
    int e2;
    for (;;){  /* loop */
       setPixel (x0,y0);
@@ -42,7 +42,7 @@ move_line(int x1, int y1)
    int dx = x1;
    int dy = y1;
    
-   int err = dx + dy /* error value e_xy */
+   int err = dx + dy; /* error value e_xy */
    int e2;
 
    if (x0 == x1 && y0 == y1) return;
