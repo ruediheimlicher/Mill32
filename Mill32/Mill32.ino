@@ -743,6 +743,7 @@ void AnschlagVonMotor(const uint8_t motor)
             sendbuffer[8]=ladeposition & 0x00FF;
             //
             sendbuffer[20]=cncstatus;
+            Serial.printf("*** Anschlag Home motor %d code: %d\n",motor, sendbuffer[0]);
             usb_rawhid_send((void*)sendbuffer, 50);
              
             //ladeposition=0;
@@ -1067,7 +1068,7 @@ void loop()
       Serial.printf("\n----------------------------------->    rawhid_recv code: %02X device: %d\n",code, device);
       for(uint8_t i=0;i<27;i++) // 5 us ohne printf, 10ms mit printf
       { 
- //        Serial.printf("%d \t",buffer[i]);
+         Serial.printf("%d \t",buffer[i]);
       }
 
       Serial.printf("\n");
@@ -1627,7 +1628,7 @@ void loop()
    // MARK: F0
       case 0xF0:// cncstatus fuer go_home setzen
          {
-            Serial.printf("home\n");
+            Serial.printf("F0 home\n");
           //  gohome();
           //  break;
             
